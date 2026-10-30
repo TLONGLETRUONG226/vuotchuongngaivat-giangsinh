@@ -3,7 +3,7 @@ import streamlit.components.v1 as components
 
 # Cấu hình Streamlit tràn màn hình
 st.set_page_config(
-    page_title="Santa's Christmas Dash 3D",
+    page_title="Santa's Christmas Dash 3D - Photorealistic",
     page_icon="🦌",
     layout="wide",
     initial_sidebar_state="collapsed"
@@ -30,8 +30,8 @@ game_html = """
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Santa Christmas Dash 3D</title>
-    <!-- Phông chữ Việt hóa hiện đại Be Vietnam Pro -->
+    <title>Santa Christmas Dash 3D Ultra</title>
+    <!-- Phông chữ Việt hóa Be Vietnam Pro & Comfortaa -->
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@700;800;900&family=Comfortaa:wght@700&display=swap');
 
@@ -77,7 +77,7 @@ game_html = """
             width: 100%;
         }
         .score-box {
-            background: rgba(15, 23, 42, 0.75);
+            background: rgba(15, 23, 42, 0.78);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             padding: 14px 32px;
@@ -223,11 +223,11 @@ game_html = """
     <!-- Màn Hình Khởi Đầu -->
     <div id="start-screen">
         <h1>🦌 ĐỘI TUẦN LỘC CỦA SANTA 3D</h1>
-        <p>Bầy 6 con tuần lộc dũng mãnh kéo xe trượt tuyết cho Ông Già Noel! Tránh các chướng ngại vật trên đường băng.<br><br><b>Cách chơi:</b> Dùng phím <b>Mũi tên Trái / Phải / A / D</b> hoặc nút cảm ứng để đổi làn, phím <b>Cách (Space) / Lên</b> để nhảy.</p>
+        <p>Bầy tuần lộc dũng mãnh kéo xe trượt tuyết cho Ông Già Noel! Hãy nhặt thật nhiều hộp quà phát sáng rực rỡ.<br><br><b>Cách chơi:</b> Dùng phím <b>Mũi tên Trái / Phải / A / D</b> hoặc nút cảm ứng để đổi làn, phím <b>Cách (Space) / Lên</b> để nhảy.</p>
         <button class="btn" onclick="startGame()">BẮT ĐẦU CHƠI 🎄</button>
     </div>
 
-    <!-- Màn Hình Thua (Đã xóa chữ đùnggg) -->
+    <!-- Màn Hình Thua -->
     <div id="gameover-screen" style="display: none;">
         <h1>💥 VẤP PHẢI CHƯỚNG NGẠI VẬT!</h1>
         <p>Đội tuần lộc và xe trượt bị va chạm rồi! Hãy thử lại ngay nhé.<br><br>🎁 Tổng số quà phát được: <b><span id="final-score">0</span></b></p>
@@ -235,7 +235,7 @@ game_html = """
     </div>
 
     <script>
-        // --- 1. ÂM THANH & HIỆU ỨNG NỔ ĐÙÙÙÙÙÙNG ---
+        // --- 1. ÂM THANH & HIỆU ỨNG TIẾNG NỔ ĐÙNG MỚI ---
         class GameAudio {
             constructor() {
                 this.ctx = null;
@@ -299,27 +299,45 @@ game_html = """
                 osc.connect(g); g.connect(this.ctx.destination);
                 osc.start(); osc.stop(this.ctx.currentTime + 0.2);
             }
-            crashBoom() {
+            // Tiếng nổ "ĐÙNG!" va chạm mới có tần số vang rầm vang dội
+            crashBoomNew() {
                 if (!this.ctx) return;
                 const now = this.ctx.currentTime;
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(130, now);
-                osc.frequency.exponentialRampToValueAtTime(25, now + 0.9);
                 
-                gain.gain.setValueAtTime(0.9, now);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.9);
+                // Dao động chính (Thùng bass nổ)
+                const mainOsc = this.ctx.createOscillator();
+                const mainGain = this.ctx.createGain();
+                mainOsc.type = 'triangle';
+                mainOsc.frequency.setValueAtTime(220, now);
+                mainOsc.frequency.exponentialRampToValueAtTime(20, now + 0.8);
                 
-                osc.connect(gain);
-                gain.connect(this.ctx.destination);
-                osc.start(now);
-                osc.stop(now + 0.9);
+                mainGain.gain.setValueAtTime(1.0, now);
+                mainGain.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
+                
+                // Dao động phụ (Rung chấn va chạm)
+                const subOsc = this.ctx.createOscillator();
+                const subGain = this.ctx.createGain();
+                subOsc.type = 'sawtooth';
+                subOsc.frequency.setValueAtTime(90, now);
+                subOsc.frequency.exponentialRampToValueAtTime(15, now + 0.6);
+                
+                subGain.gain.setValueAtTime(0.7, now);
+                subGain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+
+                mainOsc.connect(mainGain);
+                mainGain.connect(this.ctx.destination);
+                subOsc.connect(subGain);
+                subGain.connect(this.ctx.destination);
+                
+                mainOsc.start(now);
+                subOsc.start(now);
+                mainOsc.stop(now + 0.8);
+                subOsc.stop(now + 0.6);
             }
         }
         const audio = new GameAudio();
 
-        // --- 2. KHỞI TẠO THREE.JS ---
+        // --- 2. KHỞI TẠO THREE.JS REALISTIC ---
         const container = document.getElementById('canvas-container');
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0x020617);
@@ -335,14 +353,14 @@ game_html = """
         renderer.shadowMap.enabled = true;
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        renderer.toneMappingExposure = 1.4;
+        renderer.toneMappingExposure = 1.45;
         container.appendChild(renderer.domElement);
 
-        // --- 3. ÁNH SÁNG ---
-        const ambientLight = new THREE.AmbientLight(0x38bdf8, 0.6);
+        // --- 3. ÁNH SÁNG MÔI TRƯỜNG & MẶT TRĂNG ---
+        const ambientLight = new THREE.AmbientLight(0x38bdf8, 0.65);
         scene.add(ambientLight);
 
-        const moonLight = new THREE.DirectionalLight(0xe0f2fe, 1.9);
+        const moonLight = new THREE.DirectionalLight(0xe0f2fe, 2.0);
         moonLight.position.set(-25, 55, 20);
         moonLight.castShadow = true;
         moonLight.shadow.mapSize.width = 2048;
@@ -359,7 +377,7 @@ game_html = """
         moon.position.set(-35, 48, -130);
         scene.add(moon);
 
-        // --- 4. TUYẾT RƠI ---
+        // --- 4. BẦU TRỜI TUYẾT RƠI ---
         const snowCount = 1600;
         const snowGeo = new THREE.BufferGeometry();
         const snowPos = new Float32Array(snowCount * 3);
@@ -376,14 +394,17 @@ game_html = """
         const snowSystem = new THREE.Points(snowGeo, snowMat);
         scene.add(snowSystem);
 
-        // --- 5. CHẤT LIỆU & ĐƯỜNG CHẠY ---
+        // --- 5. CHẤT LIỆU CHÂN THỰC & ĐƯỜNG BĂNG ---
         const snowGroundMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.2, metalness: 0.1 });
-        const iceTrackMat = new THREE.MeshStandardMaterial({ color: 0xbae6fd, roughness: 0.08, metalness: 0.3 });
+        const iceTrackMat = new THREE.MeshStandardMaterial({ color: 0xbae6fd, roughness: 0.08, metalness: 0.35 });
         const laneDividerMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.5 });
         const woodMat = new THREE.MeshStandardMaterial({ color: 0x78350f, roughness: 0.8 });
         const leafMat = new THREE.MeshStandardMaterial({ color: 0x047857, roughness: 0.4 });
-        const giftMat = new THREE.MeshStandardMaterial({ color: 0xd97706, roughness: 0.2, metalness: 0.4 });
-        const goldMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.1, metalness: 0.9 });
+        
+        // Chất liệu Hộp Quà Sang Trọng Phát Sáng (Luxury Gift Box Materials)
+        const luxuryGiftMat = new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.15, metalness: 0.4, emissive: 0x450a0a, emissiveIntensity: 0.2 });
+        const luxuryGoldRibbonMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.1, metalness: 0.95 });
+
         const santaRedMat = new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.3 });
         const skinMat = new THREE.MeshStandardMaterial({ color: 0xfed7aa, roughness: 0.6 });
         const whiteFurMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.9 });
@@ -432,9 +453,9 @@ game_html = """
         const sleigh = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.5, 2), santaRedMat);
         sleigh.position.set(0, 0.4, 1.8); sleigh.castShadow = true; santaGroup.add(sleigh);
 
-        const runnerL = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.15, 2.4), goldMat);
+        const runnerL = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.15, 2.4), luxuryGoldRibbonMat);
         runnerL.position.set(-0.6, 0.15, 1.8); santaGroup.add(runnerL);
-        const runnerR = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.15, 2.4), goldMat);
+        const runnerR = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.15, 2.4), luxuryGoldRibbonMat);
         runnerR.position.set(0.6, 0.15, 1.8); santaGroup.add(runnerR);
 
         const santaTorso = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.4, 0.7), santaRedMat);
@@ -549,7 +570,7 @@ game_html = """
             if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') canMoveRight = true;
         });
 
-        // --- 8. TẠO VẬT CẢN & QUÀ ---
+        // --- 8. TẠO TẠO HỘP QUÀ SIÊU ĐẸP & CHƯỚNG NGẠI VẬT ---
         function spawnEntities() {
             if (!gameRunning) return;
             const laneIdx = Math.floor(Math.random() * lanes.length);
@@ -580,11 +601,26 @@ game_html = """
                 scene.add(obsGroup);
                 obstacles.push(obsGroup);
             } else {
+                // Hộp quà nâng cấp chi tiết & Nơ kim loại sáng bóng
                 const giftGroup = new THREE.Group();
-                const box = new THREE.Mesh(new THREE.BoxGeometry(1.1, 1.1, 1.1), giftMat);
+                const box = new THREE.Mesh(new THREE.BoxGeometry(1.2, 1.2, 1.2), luxuryGiftMat);
                 box.position.y = 0.6; box.castShadow = true; giftGroup.add(box);
-                const ribbon = new THREE.Mesh(new THREE.BoxGeometry(1.15, 1.15, 0.25), goldMat);
-                ribbon.position.y = 0.6; giftGroup.add(ribbon);
+
+                // Nơ dọc & ngang màu vàng kim loại
+                const ribbonV = new THREE.Mesh(new THREE.BoxGeometry(1.26, 1.26, 0.22), luxuryGoldRibbonMat);
+                ribbonV.position.y = 0.6; giftGroup.add(ribbonV);
+
+                const ribbonH = new THREE.Mesh(new THREE.BoxGeometry(0.22, 1.26, 1.26), luxuryGoldRibbonMat);
+                ribbonH.position.y = 0.6; giftGroup.add(ribbonH);
+
+                // Nơ hoa trên đỉnh hộp quà
+                const bowTop = new THREE.Mesh(new THREE.SphereGeometry(0.28, 16, 16), luxuryGoldRibbonMat);
+                bowTop.position.y = 1.28; giftGroup.add(bowTop);
+
+                // Ánh sáng phát sáng quanh hộp quà
+                const giftLight = new THREE.PointLight(0xfacc15, 0.8, 4);
+                giftLight.position.y = 0.8;
+                giftGroup.add(giftLight);
 
                 giftGroup.position.set(xPos, 0, zPos);
                 scene.add(giftGroup);
@@ -610,7 +646,7 @@ game_html = """
 
         setInterval(spawnEntities, 1000);
 
-        // --- 9. VÒNG LẶP ANIMATION ---
+        // --- 9. VÒNG LẶP ANIMATION CHÍNH ---
         function animate() {
             requestAnimationFrame(animate);
 
@@ -653,7 +689,7 @@ game_html = """
                     if (Math.abs(dx) < 1.3 && Math.abs(dz) < 1.4 && santaGroup.position.y < 1.2) {
                         gameRunning = false;
                         audio.stopBGM();
-                        audio.crashBoom(); // Phát âm thanh nổ ĐÙÙÙÙÙÙNG!
+                        audio.crashBoomNew(); // Phát tiếng nổ ĐÙNG! va chạm mới vang dội
                         document.getElementById('final-score').innerText = score;
                         document.getElementById('gameover-screen').style.display = 'flex';
                     }
