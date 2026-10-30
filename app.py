@@ -218,7 +218,7 @@ game_html = """
     <!-- Screens -->
     <div id="start-screen">
         <h1>🦌 SANTA'S 3-LANE DASH</h1>
-        <p>Bầy tuần lộc kéo xe trượt tuyết siêu hoành tráng! Đã mở rộng góc nhìn và phân chia <b>3 LÀN ĐƯỜNG RIÊNG BIỆT (Trái - Giữa - Phải)</b>.<br><br><b>Điều khiển:</b> Dùng phím <b>Mũi tên Trái / Phải / A / D</b> hoặc nút cảm ứng để chuyển làn, <b>Phím Cách / Lên</b> để nhảy.</p>
+        <p>Bầy tuần lộc kéo xe trượt tuyết! Đã tối ưu hóa điều khiển <b>3 LÀN ĐƯỜNG RIÊNG BIỆT (Trái - Giữa - Phải)</b>.<br><br><b>Điều khiển:</b> Dùng phím <b>Mũi tên Trái / Phải / A / D</b> hoặc bấm nút màn hình để chuyển từng làn một.</p>
         <button class="btn" onclick="startGame()">BẮT ĐẦU CHƠI 🎄</button>
     </div>
 
@@ -307,14 +307,13 @@ game_html = """
         }
         const audio = new GameAudio();
 
-        // --- 2. THREE.JS SCENE SETUP WITH WIDER CAMERA ---
+        // --- 2. THREE.JS SCENE SETUP ---
         const container = document.getElementById('canvas-container');
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0x020617);
         scene.fog = new THREE.FogExp2(0x020617, 0.008);
 
-        // Nâng FOV lên 65 độ để thấy rõ toàn cảnh 3 làn đường
-        const camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
         camera.position.set(0, 6.5, 12);
         camera.lookAt(0, 1.2, -4);
 
@@ -365,10 +364,10 @@ game_html = """
         const snowSystem = new THREE.Points(snowGeo, snowMat);
         scene.add(snowSystem);
 
-        // --- 5. MATERIALS & TRACK WITH 3 CLEAR LANES ---
+        // --- 5. MATERIALS & TRACK ---
         const snowGroundMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.2, metalness: 0.1 });
         const iceTrackMat = new THREE.MeshStandardMaterial({ color: 0xbae6fd, roughness: 0.08, metalness: 0.3 });
-        const laneDividerMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.4 });
+        const laneDividerMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.5 });
         const woodMat = new THREE.MeshStandardMaterial({ color: 0x78350f, roughness: 0.8 });
         const leafMat = new THREE.MeshStandardMaterial({ color: 0x047857, roughness: 0.4 });
         const giftMat = new THREE.MeshStandardMaterial({ color: 0xd97706, roughness: 0.2, metalness: 0.4 });
@@ -379,7 +378,6 @@ game_html = """
         const deerMat = new THREE.MeshStandardMaterial({ color: 0x8d5524, roughness: 0.7 });
         const antlerMat = new THREE.MeshStandardMaterial({ color: 0xd35400, roughness: 0.8 });
 
-        // Mặt đường rộng 16 đơn vị
         const trackGeo = new THREE.PlaneGeometry(16, 300);
         const track = new THREE.Mesh(trackGeo, iceTrackMat);
         track.rotation.x = -Math.PI / 2;
@@ -387,22 +385,18 @@ game_html = """
         track.receiveShadow = true;
         scene.add(track);
 
-        // Đổ vạch phân cách 3 làn rõ ràng
-        const dividerL = new THREE.Mesh(new THREE.PlaneGeometry(0.15, 300), laneDividerMat);
-        dividerL.rotation.x = -Math.PI / 2; dividerL.position.set(-2.25, 0.01, -100); scene.add(dividerL);
+        // Vạch phân cách 3 làn
+        const dividerL = new THREE.Mesh(new THREE.PlaneGeometry(0.2, 300), laneDividerMat);
+        dividerL.rotation.x = -Math.PI / 2; dividerL.position.set(-2.5, 0.01, -100); scene.add(dividerL);
 
-        const dividerR = new THREE.Mesh(new THREE.PlaneGeometry(0.15, 300), laneDividerMat);
-        dividerR.rotation.x = -Math.PI / 2; dividerR.position.set(2.25, 0.01, -100); scene.add(dividerR);
+        const dividerR = new THREE.Mesh(new THREE.PlaneGeometry(0.2, 300), laneDividerMat);
+        dividerR.rotation.x = -Math.PI / 2; dividerR.position.set(2.5, 0.01, -100); scene.add(dividerR);
 
         const bankLeft = new THREE.Mesh(new THREE.BoxGeometry(30, 2, 300), snowGroundMat);
-        bankLeft.position.set(-23, 0, -100);
-        bankLeft.receiveShadow = true;
-        scene.add(bankLeft);
+        bankLeft.position.set(-23, 0, -100); bankLeft.receiveShadow = true; scene.add(bankLeft);
 
         const bankRight = new THREE.Mesh(new THREE.BoxGeometry(30, 2, 300), snowGroundMat);
-        bankRight.position.set(23, 0, -100);
-        bankRight.receiveShadow = true;
-        scene.add(bankRight);
+        bankRight.position.set(23, 0, -100); bankRight.receiveShadow = true; scene.add(bankRight);
 
         const sideDecorations = [];
         function createPineTree() {
@@ -477,12 +471,12 @@ game_html = """
 
         scene.add(santaGroup);
 
-        // --- 7. CHUẨN XÁC 3 LÀN ĐƯỜNG RỘNG TÁCH BIỆT ---
+        // --- 7. CHỦ ĐỘNG KHÓA LẶP VẦN DỊCH CHUYỂN (DEBOUNCE INPUT FIX) ---
         let gameRunning = false;
         let score = 0, distance = 0, speed = 0.38;
         
-        // Khoảng cách 3 làn siêu rộng: Làn Trái (-4.5), Làn Giữa (0), Làn Phải (+4.5)
-        const lanes = [-4.5, 0, 4.5];
+        // Khoảng cách 3 làn: Làn Trái (-5.0), Làn Giữa (0), Làn Phải (+5.0)
+        const lanes = [-5.0, 0, 5.0];
         let currentLane = 1; // 0 = Trái, 1 = Giữa, 2 = Phải
 
         let isJumping = false, jumpVelocity = 0;
@@ -513,25 +507,36 @@ game_html = """
             }
         }
 
-        // BIND CONTROLS
+        // BIND CONTROLS VỚI CHỐNG LẶP SỰ KIỆN PHÍM (KEYUP LOCK)
+        let canMoveLeft = true;
+        let canMoveRight = true;
+
         const btnL = document.getElementById('btn-left');
         const btnR = document.getElementById('btn-right');
         const btnJ = document.getElementById('btn-jump');
 
-        const bindTrigger = (elem, fn) => {
-            elem.addEventListener('pointerdown', (e) => { e.preventDefault(); fn(); });
-            elem.addEventListener('touchstart', (e) => { e.preventDefault(); fn(); }, {passive: false});
-        };
-
-        bindTrigger(btnL, moveLeft);
-        bindTrigger(btnR, moveRight);
-        bindTrigger(btnJ, jump);
+        btnL.addEventListener('pointerdown', (e) => { e.preventDefault(); moveLeft(); });
+        btnR.addEventListener('pointerdown', (e) => { e.preventDefault(); moveRight(); });
+        btnJ.addEventListener('pointerdown', (e) => { e.preventDefault(); jump(); });
 
         window.addEventListener('keydown', (e) => {
             if (!gameRunning) return;
-            if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') moveLeft();
-            if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') moveRight();
-            if (e.key === ' ' || e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') jump();
+            if ((e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') && canMoveLeft) {
+                canMoveLeft = false;
+                moveLeft();
+            }
+            if ((e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') && canMoveRight) {
+                canMoveRight = false;
+                moveRight();
+            }
+            if (e.key === ' ' || e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') {
+                jump();
+            }
+        });
+
+        window.addEventListener('keyup', (e) => {
+            if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') canMoveLeft = true;
+            if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') canMoveRight = true;
         });
 
         // --- 8. SPAWN ENTITIES ---
@@ -612,10 +617,10 @@ game_html = """
                 document.getElementById('distance').innerText = Math.floor(distance / 10);
                 document.getElementById('score').innerText = score;
 
-                // Di chuyển xe sang làn vị trí mục tiêu
+                // Tốc độ di chuyển sang làn mượt mà
                 const targetX = lanes[currentLane];
-                santaGroup.position.x += (targetX - santaGroup.position.x) * 0.22;
-                santaGroup.rotation.z = (santaGroup.position.x - targetX) * 0.04;
+                santaGroup.position.x += (targetX - santaGroup.position.x) * 0.2;
+                santaGroup.rotation.z = (santaGroup.position.x - targetX) * 0.03;
 
                 // Vật lý nhảy
                 if (isJumping) {
