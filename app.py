@@ -431,8 +431,7 @@ game_html = """
         const bankRight = new THREE.Mesh(new THREE.BoxGeometry(32, 2.2, 300), snowGroundMat);
         bankRight.position.set(24, 0, -100); bankRight.receiveShadow = true; scene.add(bankRight);
 
-        // --- CÂY THÔNG TỰ NHIÊN NHƯ NGOÀI ĐỜI ---
-        const sideDecorations = [];
+        // --- HÀM TẠO CÂY THÔNG CHUẨN PHOTOREALISTIC (DÙNG CHUNG CHO CẢ 2 BÊN & CHƯỚNG NGẠI VẬT) ---
         function createPhotorealisticPineTree() {
             const tree = new THREE.Group();
             const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.55, 2.8), woodTrunkMat);
@@ -442,13 +441,13 @@ game_html = """
                 const cone = new THREE.Mesh(new THREE.ConeGeometry(2.4 - i*0.45, 2.6, 12), pineLeafMat);
                 cone.position.y = 2.0 + i * 1.1; cone.castShadow = true; tree.add(cone);
                 
-                // Lớp tuyết phủ trên đỉnh mỗi tầng lá thông
                 const snowCap = new THREE.Mesh(new THREE.ConeGeometry(2.1 - i*0.4, 0.6, 12), snowCapMat);
                 snowCap.position.y = 3.1 + i * 1.1; tree.add(snowCap);
             }
             return tree;
         }
 
+        const sideDecorations = [];
         for(let z = -200; z < 20; z += 10) {
             const treeL = createPhotorealisticPineTree(); treeL.position.set(-11 - Math.random()*9, 0, z); scene.add(treeL); sideDecorations.push(treeL);
             const treeR = createPhotorealisticPineTree(); treeR.position.set(11 + Math.random()*9, 0, z + 5); scene.add(treeR); sideDecorations.push(treeR);
@@ -590,10 +589,9 @@ game_html = """
                 const type = Math.random();
 
                 if (type < 0.35) {
-                    const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.6, 1.5), woodTrunkMat);
-                    trunk.position.y = 0.75; trunk.castShadow = true; obsGroup.add(trunk);
-                    const cone = new THREE.Mesh(new THREE.ConeGeometry(1.6, 3.5, 8), pineLeafMat);
-                    cone.position.y = 2.5; cone.castShadow = true; obsGroup.add(cone);
+                    // Cây thông chướng ngại vật nay dùng chung hàm với rừng cây 2 bên cho cực kỳ chân thực
+                    const obstacleTree = createPhotorealisticPineTree();
+                    obsGroup.add(obstacleTree);
                 } else if (type < 0.75) {
                     // --- NGƯỜI TUYẾT SỐNG ĐỘNG NHƯ THẬT ---
                     const bodyLower = new THREE.Mesh(new THREE.SphereGeometry(1.15, 24, 24), snowmanBodyMat);
@@ -605,30 +603,25 @@ game_html = """
                     const head = new THREE.Mesh(new THREE.SphereGeometry(0.58, 24, 24), snowmanBodyMat);
                     head.position.y = 3.35; head.castShadow = true; obsGroup.add(head);
 
-                    // Khăn choàng cổ sang trọng
                     const scarf = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.62, 0.28, 24), scarfMat);
                     scarf.position.y = 3.0; scarf.castShadow = true; obsGroup.add(scarf);
                     const scarfTail = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.65, 0.1), scarfMat);
                     scarfTail.position.set(0.32, 2.7, 0.42); obsGroup.add(scarfTail);
 
-                    // Mắt sỏi đen
                     const eyeL = new THREE.Mesh(new THREE.SphereGeometry(0.06, 12, 12), coalMat);
                     eyeL.position.set(-0.18, 3.48, 0.5); obsGroup.add(eyeL);
                     const eyeR = new THREE.Mesh(new THREE.SphereGeometry(0.06, 12, 12), coalMat);
                     eyeR.position.set(0.18, 3.48, 0.5); obsGroup.add(eyeR);
 
-                    // Mũi cà rốt cam
                     const nose = new THREE.Mesh(new THREE.ConeGeometry(0.08, 0.42, 16), carrotMat);
                     nose.rotation.x = Math.PI / 2;
                     nose.position.set(0, 3.35, 0.68); obsGroup.add(nose);
 
-                    // Miệng sỏi
                     for(let m = -1; m <= 1; m++) {
                         const mouthDot = new THREE.Mesh(new THREE.SphereGeometry(0.03, 8, 8), coalMat);
                         mouthDot.position.set(m * 0.1, 3.16, 0.54); obsGroup.add(mouthDot);
                     }
 
-                    // Mũ phớt đen
                     const hatBrim = new THREE.Mesh(new THREE.CylinderGeometry(0.48, 0.48, 0.08, 24), topHatMat);
                     hatBrim.position.y = 3.72; obsGroup.add(hatBrim);
                     const hatTop = new THREE.Mesh(new THREE.CylinderGeometry(0.32, 0.32, 0.42, 24), topHatMat);
@@ -728,7 +721,7 @@ game_html = """
                     if (Math.abs(dx) < 1.3 && Math.abs(dz) < 1.4 && santaGroup.position.y < 1.2) {
                         gameRunning = false;
                         audio.stopBGM();
-                        audio.crashBoomCinematic(); // Phát tiếng nổ ĐÙNG! cinematic
+                        audio.crashBoomCinematic();
                         document.getElementById('final-score').innerText = score;
                         document.getElementById('gameover-screen').style.display = 'flex';
                     }
