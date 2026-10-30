@@ -3,7 +3,7 @@ import streamlit.components.v1 as components
 
 # Cấu hình Streamlit tràn màn hình
 st.set_page_config(
-    page_title="Santa's Reindeer Herd 3D Dash - 3 Lanes",
+    page_title="Santa's Reindeer Herd 3D - Fixed 3 Lanes",
     page_icon="🦌",
     layout="wide",
     initial_sidebar_state="collapsed"
@@ -30,7 +30,7 @@ game_html = """
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Santa Reindeer Herd Dash 3D</title>
+    <title>Santa Reindeer Dash 3D</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@800;900&display=swap');
 
@@ -76,12 +76,12 @@ game_html = """
             width: 100%;
         }
         .score-box {
-            background: rgba(15, 23, 42, 0.75);
+            background: rgba(15, 23, 42, 0.85);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             padding: 12px 28px;
             border-radius: 24px;
-            border: 2px solid rgba(255, 255, 255, 0.25);
+            border: 2px solid rgba(255, 255, 255, 0.3);
             color: #ffffff;
             font-size: 22px;
             font-family: 'Fredoka One', cursive;
@@ -98,7 +98,7 @@ game_html = """
             left: 0;
             width: 100%;
             height: 100%;
-            background: radial-gradient(circle at center, rgba(15, 23, 42, 0.85) 0%, rgba(2, 6, 23, 0.98) 100%);
+            background: radial-gradient(circle at center, rgba(15, 23, 42, 0.88) 0%, rgba(2, 6, 23, 0.98) 100%);
             backdrop-filter: blur(12px);
             display: flex;
             flex-direction: column;
@@ -217,8 +217,8 @@ game_html = """
 
     <!-- Screens -->
     <div id="start-screen">
-        <h1>🦌 SANTA'S REINDEER HERD DASH</h1>
-        <p>Bầy tuần lộc hùng hậu kéo xe cho ông già Noel! Tránh chướng ngại vật lớn và đa dạng trên đường băng.<br><br><b>Điều khiển:</b> Nút cảm ứng hoặc dùng phím <b>Mũi tên Trái / Phải / A / D</b> để di chuyển linh hoạt qua <b>3 làn (Trái - Giữa - Phải)</b>, <b>Phím Cách / Lên</b> để nhảy.</p>
+        <h1>🦌 SANTA'S 3-LANE DASH</h1>
+        <p>Bầy tuần lộc kéo xe trượt tuyết siêu hoành tráng! Đã mở rộng góc nhìn và phân chia <b>3 LÀN ĐƯỜNG RIÊNG BIỆT (Trái - Giữa - Phải)</b>.<br><br><b>Điều khiển:</b> Dùng phím <b>Mũi tên Trái / Phải / A / D</b> hoặc nút cảm ứng để chuyển làn, <b>Phím Cách / Lên</b> để nhảy.</p>
         <button class="btn" onclick="startGame()">BẮT ĐẦU CHƠI 🎄</button>
     </div>
 
@@ -229,7 +229,7 @@ game_html = """
     </div>
 
     <script>
-        // --- 1. AUDIO SYNTHESIZER & BGM ---
+        // --- 1. AUDIO SYNTHESIZER ---
         class GameAudio {
             constructor() {
                 this.ctx = null;
@@ -307,14 +307,15 @@ game_html = """
         }
         const audio = new GameAudio();
 
-        // --- 2. THREE.JS SCENE SETUP ---
+        // --- 2. THREE.JS SCENE SETUP WITH WIDER CAMERA ---
         const container = document.getElementById('canvas-container');
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0x020617);
-        scene.fog = new THREE.FogExp2(0x020617, 0.0085);
+        scene.fog = new THREE.FogExp2(0x020617, 0.008);
 
-        const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(0, 5.8, 11.5);
+        // Nâng FOV lên 65 độ để thấy rõ toàn cảnh 3 làn đường
+        const camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 6.5, 12);
         camera.lookAt(0, 1.2, -4);
 
         const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
@@ -327,7 +328,7 @@ game_html = """
         container.appendChild(renderer.domElement);
 
         // --- 3. LIGHTING ---
-        const ambientLight = new THREE.AmbientLight(0x38bdf8, 0.5);
+        const ambientLight = new THREE.AmbientLight(0x38bdf8, 0.55);
         scene.add(ambientLight);
 
         const moonLight = new THREE.DirectionalLight(0xe0f2fe, 1.8);
@@ -337,10 +338,10 @@ game_html = """
         moonLight.shadow.mapSize.height = 2048;
         moonLight.shadow.camera.near = 0.5;
         moonLight.shadow.camera.far = 160;
-        moonLight.shadow.camera.left = -25;
-        moonLight.shadow.camera.right = 25;
-        moonLight.shadow.camera.top = 25;
-        moonLight.shadow.camera.bottom = -25;
+        moonLight.shadow.camera.left = -30;
+        moonLight.shadow.camera.right = 30;
+        moonLight.shadow.camera.top = 30;
+        moonLight.shadow.camera.bottom = -30;
         scene.add(moonLight);
 
         const moon = new THREE.Mesh(new THREE.SphereGeometry(5, 32, 32), new THREE.MeshBasicMaterial({ color: 0xfffbe1 }));
@@ -354,7 +355,7 @@ game_html = """
         const snowSpeeds = [];
 
         for(let i = 0; i < snowCount; i++) {
-            snowPos[i*3] = (Math.random() - 0.5) * 95;
+            snowPos[i*3] = (Math.random() - 0.5) * 100;
             snowPos[i*3 + 1] = Math.random() * 45;
             snowPos[i*3 + 2] = (Math.random() - 0.5) * 160 - 50;
             snowSpeeds.push({ y: Math.random() * 0.12 + 0.05, x: Math.random() * 0.04 - 0.02 });
@@ -364,9 +365,10 @@ game_html = """
         const snowSystem = new THREE.Points(snowGeo, snowMat);
         scene.add(snowSystem);
 
-        // --- 5. MATERIALS & ENVIRONMENT ---
+        // --- 5. MATERIALS & TRACK WITH 3 CLEAR LANES ---
         const snowGroundMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.2, metalness: 0.1 });
         const iceTrackMat = new THREE.MeshStandardMaterial({ color: 0xbae6fd, roughness: 0.08, metalness: 0.3 });
+        const laneDividerMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.4 });
         const woodMat = new THREE.MeshStandardMaterial({ color: 0x78350f, roughness: 0.8 });
         const leafMat = new THREE.MeshStandardMaterial({ color: 0x047857, roughness: 0.4 });
         const giftMat = new THREE.MeshStandardMaterial({ color: 0xd97706, roughness: 0.2, metalness: 0.4 });
@@ -377,20 +379,28 @@ game_html = """
         const deerMat = new THREE.MeshStandardMaterial({ color: 0x8d5524, roughness: 0.7 });
         const antlerMat = new THREE.MeshStandardMaterial({ color: 0xd35400, roughness: 0.8 });
 
-        const trackGeo = new THREE.PlaneGeometry(13, 300);
+        // Mặt đường rộng 16 đơn vị
+        const trackGeo = new THREE.PlaneGeometry(16, 300);
         const track = new THREE.Mesh(trackGeo, iceTrackMat);
         track.rotation.x = -Math.PI / 2;
         track.position.z = -100;
         track.receiveShadow = true;
         scene.add(track);
 
+        // Đổ vạch phân cách 3 làn rõ ràng
+        const dividerL = new THREE.Mesh(new THREE.PlaneGeometry(0.15, 300), laneDividerMat);
+        dividerL.rotation.x = -Math.PI / 2; dividerL.position.set(-2.25, 0.01, -100); scene.add(dividerL);
+
+        const dividerR = new THREE.Mesh(new THREE.PlaneGeometry(0.15, 300), laneDividerMat);
+        dividerR.rotation.x = -Math.PI / 2; dividerR.position.set(2.25, 0.01, -100); scene.add(dividerR);
+
         const bankLeft = new THREE.Mesh(new THREE.BoxGeometry(30, 2, 300), snowGroundMat);
-        bankLeft.position.set(-21.5, 0, -100);
+        bankLeft.position.set(-23, 0, -100);
         bankLeft.receiveShadow = true;
         scene.add(bankLeft);
 
         const bankRight = new THREE.Mesh(new THREE.BoxGeometry(30, 2, 300), snowGroundMat);
-        bankRight.position.set(21.5, 0, -100);
+        bankRight.position.set(23, 0, -100);
         bankRight.receiveShadow = true;
         scene.add(bankRight);
 
@@ -407,17 +417,15 @@ game_html = """
         }
 
         for(let z = -200; z < 20; z += 10) {
-            const treeL = createPineTree(); treeL.position.set(-8.5 - Math.random()*8, 1, z); scene.add(treeL); sideDecorations.push(treeL);
-            const treeR = createPineTree(); treeR.position.set(8.5 + Math.random()*8, 1, z + 5); scene.add(treeR); sideDecorations.push(treeR);
+            const treeL = createPineTree(); treeL.position.set(-10 - Math.random()*8, 1, z); scene.add(treeL); sideDecorations.push(treeL);
+            const treeR = createPineTree(); treeR.position.set(10 + Math.random()*8, 1, z + 5); scene.add(treeR); sideDecorations.push(treeR);
         }
 
         // --- 6. SANTA & REINDEER HERD 3D MODEL ---
         const santaGroup = new THREE.Group();
 
         const sleigh = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.5, 2), santaRedMat);
-        sleigh.position.set(0, 0.4, 1.2);
-        sleigh.castShadow = true;
-        santaGroup.add(sleigh);
+        sleigh.position.set(0, 0.4, 1.2); sleigh.castShadow = true; santaGroup.add(sleigh);
 
         const runnerL = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.15, 2.4), goldMat);
         runnerL.position.set(-0.6, 0.15, 1.2); santaGroup.add(runnerL);
@@ -469,13 +477,13 @@ game_html = """
 
         scene.add(santaGroup);
 
-        // --- 7. CHUẨN XÁC 3 LÀN ĐƯỜNG RIÊNG BIỆT ---
+        // --- 7. CHUẨN XÁC 3 LÀN ĐƯỜNG RỘNG TÁCH BIỆT ---
         let gameRunning = false;
         let score = 0, distance = 0, speed = 0.38;
         
-        // 3 Làn đường tuyệt đối: [Làn Trái = -4.0, Làn Giữa = 0, Làn Phải = 4.0]
-        const lanes = [-4.0, 0, 4.0];
-        let currentLane = 1; // Bắt đầu ở làn giữa (Index 1)
+        // Khoảng cách 3 làn siêu rộng: Làn Trái (-4.5), Làn Giữa (0), Làn Phải (+4.5)
+        const lanes = [-4.5, 0, 4.5];
+        let currentLane = 1; // 0 = Trái, 1 = Giữa, 2 = Phải
 
         let isJumping = false, jumpVelocity = 0;
         const gravity = 0.016;
@@ -485,14 +493,14 @@ game_html = """
         function moveLeft() {
             if (!gameRunning) return;
             if (currentLane > 0) {
-                currentLane--; // Giảm chỉ số (từ 1 về 0, hoặc từ 2 về 1)
+                currentLane--;
             }
         }
 
         function moveRight() {
             if (!gameRunning) return;
             if (currentLane < 2) {
-                currentLane++; // Tăng chỉ số (từ 0 lên 1, hoặc từ 1 lên 2)
+                currentLane++;
             }
         }
 
@@ -521,9 +529,9 @@ game_html = """
 
         window.addEventListener('keydown', (e) => {
             if (!gameRunning) return;
-            if (e.key === 'ArrowLeft' || e.key === 'a') moveLeft();
-            if (e.key === 'ArrowRight' || e.key === 'd') moveRight();
-            if (e.key === ' ' || e.key === 'ArrowUp' || e.key === 'w') jump();
+            if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') moveLeft();
+            if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') moveRight();
+            if (e.key === ' ' || e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') jump();
         });
 
         // --- 8. SPAWN ENTITIES ---
@@ -604,10 +612,10 @@ game_html = """
                 document.getElementById('distance').innerText = Math.floor(distance / 10);
                 document.getElementById('score').innerText = score;
 
-                // Di chuyển mượt mà tuyệt đối sang đúng 3 vị trí làn (Trái: -4.0, Giữa: 0, Phải: 4.0)
+                // Di chuyển xe sang làn vị trí mục tiêu
                 const targetX = lanes[currentLane];
-                santaGroup.position.x += (targetX - santaGroup.position.x) * 0.25;
-                santaGroup.rotation.z = (santaGroup.position.x - targetX) * 0.05;
+                santaGroup.position.x += (targetX - santaGroup.position.x) * 0.22;
+                santaGroup.rotation.z = (santaGroup.position.x - targetX) * 0.04;
 
                 // Vật lý nhảy
                 if (isJumping) {
