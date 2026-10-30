@@ -1,38 +1,37 @@
 import streamlit as st
 import streamlit.components.v1 as components
 
-# Cấu hình giao diện Streamlit rộng toàn màn hình
+# Cấu hình Streamlit tràn màn hình
 st.set_page_config(
-    page_title="Santa's Christmas Dash 3D Ultra",
+    page_title="Santa's Christmas Dash 3D Hyper-Realistic",
     page_icon="🎅",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
-# Ẩn header và footer mặc định của Streamlit
-hide_streamlit_style = """
+# Ẩn các thành phần thừa của Streamlit
+st.markdown("""
     <style>
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     header {visibility: hidden;}
     .block-container {
-        padding-top: 0rem;
-        padding-bottom: 0rem;
-        padding-left: 0rem;
-        padding-right: 0rem;
+        padding: 0rem !important;
+    }
+    iframe {
+        border: none;
     }
     </style>
-"""
-st.markdown(hide_streamlit_style, unsafe_allow_html=True)
+""", unsafe_allow_html=True)
 
-# Mã nguồn HTML / Three.js siêu chân thực kèm Âm thanh
+# Code HTML/Three.js siêu chân thực kèm sửa lỗi điều khiển
 game_html = """
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Santa's Dash Ultra 3D</title>
+    <title>Santa Dash 3D Hyper-Realistic</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@800;900&display=swap');
 
@@ -40,6 +39,7 @@ game_html = """
             box-sizing: border-box;
             user-select: none;
             -webkit-user-select: none;
+            -webkit-touch-callout: none;
         }
         body, html {
             margin: 0;
@@ -56,7 +56,7 @@ game_html = """
             display: block;
         }
         
-        /* UI Overlay */
+        /* HUD UI */
         #ui-layer {
             position: absolute;
             top: 0;
@@ -86,21 +86,20 @@ game_html = """
             color: #ffffff;
             font-size: 22px;
             font-family: 'Fredoka One', cursive;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255,255,255,0.4);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             display: flex;
             align-items: center;
             gap: 12px;
-            letter-spacing: 1px;
         }
         
-        /* UI Screens */
+        /* Screens Overlay */
         #start-screen, #gameover-screen {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: radial-gradient(circle at center, rgba(15, 23, 42, 0.85) 0%, rgba(2, 6, 23, 0.98) 100%);
+            background: radial-gradient(circle at center, rgba(15, 23, 42, 0.8) 0%, rgba(2, 6, 23, 0.96) 100%);
             backdrop-filter: blur(12px);
             display: flex;
             flex-direction: column;
@@ -138,26 +137,24 @@ game_html = """
             font-family: 'Fredoka One', cursive;
             border-radius: 50px;
             cursor: pointer;
-            box-shadow: 0 12px 30px rgba(235, 77, 75, 0.6), inset 0 2px 2px rgba(255,255,255,0.5);
-            transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 12px 30px rgba(235, 77, 75, 0.6);
+            transition: all 0.2s ease;
             pointer-events: auto;
-            letter-spacing: 1px;
         }
         .btn:hover {
-            transform: translateY(-4px) scale(1.05);
-            box-shadow: 0 18px 40px rgba(235, 77, 75, 0.8);
+            transform: translateY(-3px) scale(1.03);
         }
         
-        /* Controller Buttons */
+        /* Controls Overlay Fix */
         #controls-wrapper {
             position: absolute;
-            bottom: 25px;
+            bottom: 30px;
             left: 0;
             width: 100%;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 35px;
+            padding: 0 30px;
             pointer-events: none;
             z-index: 15;
         }
@@ -167,32 +164,32 @@ game_html = """
             pointer-events: auto;
         }
         .ctrl-btn {
-            background: rgba(255, 255, 255, 0.18);
+            background: rgba(255, 255, 255, 0.25);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            border: 2px solid rgba(255, 255, 255, 0.4);
+            border: 2px solid rgba(255, 255, 255, 0.5);
             color: white;
-            font-size: 28px;
-            width: 72px;
-            height: 72px;
+            font-size: 30px;
+            width: 76px;
+            height: 76px;
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
             cursor: pointer;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
-            transition: all 0.1s ease;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            touch-action: manipulation;
         }
         .ctrl-btn:active {
-            background: rgba(235, 77, 75, 0.8);
-            transform: scale(0.9);
+            background: rgba(235, 77, 75, 0.9);
+            transform: scale(0.88);
         }
         .btn-jump {
-            width: 84px;
-            height: 84px;
-            background: rgba(249, 202, 36, 0.3);
-            border-color: rgba(249, 202, 36, 0.8);
-            font-size: 34px;
+            width: 86px;
+            height: 86px;
+            background: rgba(249, 202, 36, 0.35);
+            border-color: rgba(249, 202, 36, 0.9);
+            font-size: 36px;
         }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -208,7 +205,7 @@ game_html = """
         </div>
     </div>
 
-    <!-- Controls -->
+    <!-- On-screen Controls -->
     <div id="controls-wrapper">
         <div class="d-pad">
             <div class="ctrl-btn" id="btn-left">⬅️</div>
@@ -219,81 +216,65 @@ game_html = """
         </div>
     </div>
 
-    <!-- Start Screen -->
+    <!-- Screens -->
     <div id="start-screen">
         <h1>🎅 SANTA'S DASH 3D ULTRA</h1>
-        <p>Đồng hành cùng Ông Già Noel lướt qua rừng tuyết đêm Giáng Sinh siêu chân thực! Tránh chướng ngại vật và thu thập thật nhiều hộp quà.<br><br><b>Điều khiển:</b> Nút cảm ứng trên màn hình hoặc phím <b>Mũi tên Trái / Phải</b> để chuyển làn, <b>Phím Cách (Space) / Mũi tên Lên</b> để nhảy.</p>
-        <button class="btn" onclick="startGame()">BẮT ĐẦU CHƠI 🎄</button>
+        <p>Bầu trời tuyết rơi huyền ảo! Giúp Ông Già Noel thu thập quà và tránh chướng ngại vật trong đêm Giáng Sinh.<br><br><b>Điều khiển:</b> Bấm các nút mũi tên trên màn hình hoặc dùng phím <b>Mũi tên Trái / Phải</b> để chuyển làn, <b>Phím Cách / Mũi tên Lên</b> để nhảy.</p>
+        <button class="btn" onclick="startGame()">BẮT ĐẦU CHƠI ❄️</button>
     </div>
 
-    <!-- Game Over Screen -->
     <div id="gameover-screen" style="display: none;">
         <h1>💥 VẤP PHẢI CHƯỚNG NGẠI VẬT!</h1>
-        <p>Xe trượt tuyết của Santa đã bị lật! Hãy thử lại để đạt điểm số kỷ lục nhé.<br><br>🎁 Tổng số quà thu thập: <b><span id="final-score">0</span></b></p>
+        <p>Xe trượt tuyết bị lật rồi! Hãy thử lại để giành lại số quà đã mất nhé.<br><br>🎁 Tổng số quà: <b><span id="final-score">0</span></b></p>
         <button class="btn" onclick="restartGame()">CHƠI LẠI 🔄</button>
     </div>
 
     <script>
-        // --- 1. WEB AUDIO SYNTHESIZER (Hệ thống âm thanh không tệp) ---
-        class SoundEffects {
-            constructor() {
-                this.ctx = null;
-            }
-            init() {
-                if (!this.ctx) {
-                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-                }
-            }
-            playBell() {
+        // --- 1. AUDIO SYNTHESIZER ---
+        class SoundFX {
+            constructor() { this.ctx = null; }
+            init() { if (!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)(); }
+            bell() {
                 if (!this.ctx) return;
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
+                const osc = this.ctx.createOscillator(), gain = this.ctx.createGain();
                 osc.type = 'sine';
-                osc.frequency.setValueAtTime(987.77, this.ctx.currentTime); // B5
-                osc.frequency.exponentialRampToValueAtTime(1318.51, this.ctx.currentTime + 0.1); // E6
-                gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.5);
-                osc.connect(gain);
-                gain.connect(this.ctx.destination);
-                osc.start();
-                osc.stop(this.ctx.currentTime + 0.5);
+                osc.frequency.setValueAtTime(1046.5, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1567.98, this.ctx.currentTime + 0.15);
+                gain.gain.setValueAtTime(0.4, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.4);
+                osc.connect(gain); gain.connect(this.ctx.destination);
+                osc.start(); osc.stop(this.ctx.currentTime + 0.4);
             }
-            playJump() {
+            jump() {
                 if (!this.ctx) return;
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
+                const osc = this.ctx.createOscillator(), gain = this.ctx.createGain();
                 osc.type = 'triangle';
-                osc.frequency.setValueAtTime(150, this.ctx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(400, this.ctx.currentTime + 0.2);
+                osc.frequency.setValueAtTime(180, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(450, this.ctx.currentTime + 0.2);
                 gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
                 gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.2);
-                osc.connect(gain);
-                gain.connect(this.ctx.destination);
-                osc.start();
-                osc.stop(this.ctx.currentTime + 0.2);
+                osc.connect(gain); gain.connect(this.ctx.destination);
+                osc.start(); osc.stop(this.ctx.currentTime + 0.2);
             }
-            playCrash() {
+            crash() {
                 if (!this.ctx) return;
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
+                const osc = this.ctx.createOscillator(), gain = this.ctx.createGain();
                 osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(120, this.ctx.currentTime);
-                osc.frequency.linearRampToValueAtTime(30, this.ctx.currentTime + 0.4);
+                osc.frequency.setValueAtTime(140, this.ctx.currentTime);
+                osc.frequency.linearRampToValueAtTime(40, this.ctx.currentTime + 0.4);
                 gain.gain.setValueAtTime(0.5, this.ctx.currentTime);
                 gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.4);
-                osc.connect(gain);
-                gain.connect(this.ctx.destination);
-                osc.start();
-                osc.stop(this.ctx.currentTime + 0.4);
+                osc.connect(gain); gain.connect(this.ctx.destination);
+                osc.start(); osc.stop(this.ctx.currentTime + 0.4);
             }
         }
-        const sfx = new SoundEffects();
+        const sfx = new SoundFX();
 
         // --- 2. THREE.JS SCENE SETUP ---
         const container = document.getElementById('canvas-container');
         const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x020617);
-        scene.fog = new THREE.FogExp2(0x020617, 0.012);
+        scene.background = new THREE.Color(0x030712);
+        scene.fog = new THREE.FogExp2(0x030712, 0.01);
 
         const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
         camera.position.set(0, 5.5, 11);
@@ -305,15 +286,15 @@ game_html = """
         renderer.shadowMap.enabled = true;
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        renderer.toneMappingExposure = 1.2;
+        renderer.toneMappingExposure = 1.25;
         container.appendChild(renderer.domElement);
 
-        // --- 3. LIGHTING ---
-        const ambientLight = new THREE.AmbientLight(0xdff9fb, 0.5);
+        // --- 3. LIGHTING & MOON ---
+        const ambientLight = new THREE.AmbientLight(0x38bdf8, 0.45);
         scene.add(ambientLight);
 
-        const moonLight = new THREE.DirectionalLight(0x38bdf8, 1.4);
-        moonLight.position.set(-20, 45, 20);
+        const moonLight = new THREE.DirectionalLight(0xbfdbfe, 1.5);
+        moonLight.position.set(-25, 50, 20);
         moonLight.castShadow = true;
         moonLight.shadow.mapSize.width = 2048;
         moonLight.shadow.mapSize.height = 2048;
@@ -325,22 +306,48 @@ game_html = """
         moonLight.shadow.camera.bottom = -25;
         scene.add(moonLight);
 
-        const santaLight = new THREE.PointLight(0xff7675, 2, 12);
+        // Moon Mesh
+        const moonGeo = new THREE.SphereGeometry(4, 32, 32);
+        const moonMat = new THREE.MeshBasicMaterial({ color: 0xfffbe1 });
+        const moon = new THREE.Mesh(moonGeo, moonMat);
+        moon.position.set(-30, 45, -120);
+        scene.add(moon);
+
+        const santaLight = new THREE.PointLight(0xef4444, 2, 12);
         scene.add(santaLight);
 
-        // --- 4. MATERIALS ---
-        const snowMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.2, metalness: 0.1 });
-        const iceTrackMat = new THREE.MeshStandardMaterial({ color: 0xe0f2fe, roughness: 0.1, metalness: 0.3 });
+        // --- 4. SNOW PARTICLES IN SKY (BẦU TRỜI TUYẾT RƠI) ---
+        const snowCount = 1200;
+        const snowGeo = new THREE.BufferGeometry();
+        const snowPos = new Float32Array(snowCount * 3);
+        const snowSpeeds = [];
+
+        for(let i = 0; i < snowCount; i++) {
+            snowPos[i*3] = (Math.random() - 0.5) * 80;
+            snowPos[i*3 + 1] = Math.random() * 40;
+            snowPos[i*3 + 2] = (Math.random() - 0.5) * 160 - 50;
+            snowSpeeds.push({
+                y: Math.random() * 0.12 + 0.05,
+                x: Math.random() * 0.04 - 0.02
+            });
+        }
+        snowGeo.setAttribute('position', new THREE.BufferAttribute(snowPos, 3));
+        const snowMat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.25, transparent: true, opacity: 0.85 });
+        const snowSystem = new THREE.Points(snowGeo, snowMat);
+        scene.add(snowSystem);
+
+        // --- 5. MATERIALS ---
+        const snowGroundMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.25, metalness: 0.1 });
+        const iceTrackMat = new THREE.MeshStandardMaterial({ color: 0xbae6fd, roughness: 0.1, metalness: 0.25 });
         const woodMat = new THREE.MeshStandardMaterial({ color: 0x78350f, roughness: 0.8 });
-        const leafMat = new THREE.MeshStandardMaterial({ color: 0x065f46, roughness: 0.4 });
+        const leafMat = new THREE.MeshStandardMaterial({ color: 0x047857, roughness: 0.4 });
         const giftMat = new THREE.MeshStandardMaterial({ color: 0xd97706, roughness: 0.2, metalness: 0.4 });
         const goldMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.1, metalness: 0.9 });
-        const redMat = new THREE.MeshStandardMaterial({ color: 0xd97706, roughness: 0.3 });
         const santaRedMat = new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.3 });
         const skinMat = new THREE.MeshStandardMaterial({ color: 0xfed7aa, roughness: 0.6 });
         const whiteFurMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.9 });
 
-        // --- 5. ENVIRONMENT BUILDER ---
+        // Track & Snowbanks
         const trackGeo = new THREE.PlaneGeometry(12, 300);
         const track = new THREE.Mesh(trackGeo, iceTrackMat);
         track.rotation.x = -Math.PI / 2;
@@ -348,218 +355,102 @@ game_html = """
         track.receiveShadow = true;
         scene.add(track);
 
-        const bankLeft = new THREE.Mesh(new THREE.BoxGeometry(30, 2, 300), snowMat);
+        const bankLeft = new THREE.Mesh(new THREE.BoxGeometry(30, 2, 300), snowGroundMat);
         bankLeft.position.set(-21, 0, -100);
         bankLeft.receiveShadow = true;
         scene.add(bankLeft);
 
-        const bankRight = new THREE.Mesh(new THREE.BoxGeometry(30, 2, 300), snowMat);
+        const bankRight = new THREE.Mesh(new THREE.BoxGeometry(30, 2, 300), snowGroundMat);
         bankRight.position.set(21, 0, -100);
         bankRight.receiveShadow = true;
         scene.add(bankRight);
 
-        // Dynamic Side Objects
+        // Side Scenery
         const sideDecorations = [];
-
         function createPineTree() {
             const tree = new THREE.Group();
             const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.5, 2.5), woodMat);
-            trunk.position.y = 1.25;
-            trunk.castShadow = true;
-            tree.add(trunk);
-
+            trunk.position.y = 1.25; trunk.castShadow = true; tree.add(trunk);
             for(let i = 0; i < 4; i++) {
                 const cone = new THREE.Mesh(new THREE.ConeGeometry(2.2 - i*0.4, 2.8 - i*0.4, 8), leafMat);
-                cone.position.y = 2.2 + i * 1.2;
-                cone.castShadow = true;
-                tree.add(cone);
+                cone.position.y = 2.2 + i * 1.2; cone.castShadow = true; tree.add(cone);
             }
             return tree;
         }
 
-        function createSnowman() {
-            const snowman = new THREE.Group();
-            const base = new THREE.Mesh(new THREE.SphereGeometry(1, 16, 16), snowMat);
-            base.position.y = 0.8;
-            base.castShadow = true;
-            snowman.add(base);
-
-            const head = new THREE.Mesh(new THREE.SphereGeometry(0.65, 16, 16), snowMat);
-            head.position.y = 2.1;
-            head.castShadow = true;
-            snowman.add(head);
-
-            const nose = new THREE.Mesh(new THREE.ConeGeometry(0.12, 0.6, 8), new THREE.MeshStandardMaterial({ color: 0xea580c }));
-            nose.rotation.x = Math.PI / 2;
-            nose.position.set(0, 2.1, 0.7);
-            snowman.add(nose);
-
-            return snowman;
-        }
-
-        function createStreetLamp() {
-            const lamp = new THREE.Group();
-            const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 5.5), woodMat);
-            pole.position.y = 2.75;
-            pole.castShadow = true;
-            lamp.add(pole);
-
-            const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.45, 16, 16), new THREE.MeshBasicMaterial({ color: 0xfacc15 }));
-            bulb.position.y = 5.5;
-            lamp.add(bulb);
-
-            const pLight = new THREE.PointLight(0xfacc15, 1.2, 10);
-            pLight.position.y = 5.5;
-            lamp.add(pLight);
-            return lamp;
-        }
-
         for(let z = -200; z < 20; z += 10) {
-            const treeL = createPineTree();
-            treeL.position.set(-8 - Math.random()*8, 1, z);
-            scene.add(treeL);
-            sideDecorations.push(treeL);
-
-            const treeR = createPineTree();
-            treeR.position.set(8 + Math.random()*8, 1, z + 5);
-            scene.add(treeR);
-            sideDecorations.push(treeR);
-
-            if(Math.random() > 0.6) {
-                const sm = createSnowman();
-                sm.position.set(Math.random() > 0.5 ? -6.8 : 6.8, 0, z + 2);
-                scene.add(sm);
-                sideDecorations.push(sm);
-            } else if(Math.random() > 0.5) {
-                const lamp = createStreetLamp();
-                lamp.position.set(Math.random() > 0.5 ? -6.8 : 6.8, 0, z);
-                scene.add(lamp);
-                sideDecorations.push(lamp);
-            }
+            const treeL = createPineTree(); treeL.position.set(-8 - Math.random()*8, 1, z); scene.add(treeL); sideDecorations.push(treeL);
+            const treeR = createPineTree(); treeR.position.set(8 + Math.random()*8, 1, z + 5); scene.add(treeR); sideDecorations.push(treeR);
         }
 
-        // --- 6. REALISTIC SANTA MODEL ---
+        // --- 6. SANTA CHARACTER MODEL ---
         const santaGroup = new THREE.Group();
-
-        // Sleigh (Xe trượt tuyết)
         const sleighBase = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.4, 2.2), santaRedMat);
-        sleighBase.position.y = 0.5;
-        sleighBase.castShadow = true;
-        santaGroup.add(sleighBase);
+        sleighBase.position.y = 0.5; sleighBase.castShadow = true; santaGroup.add(sleighBase);
 
         const runnerL = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.2, 2.6), goldMat);
-        runnerL.position.set(-0.6, 0.2, 0);
-        santaGroup.add(runnerL);
-
+        runnerL.position.set(-0.6, 0.2, 0); santaGroup.add(runnerL);
         const runnerR = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.2, 2.6), goldMat);
-        runnerR.position.set(0.6, 0.2, 0);
-        santaGroup.add(runnerR);
+        runnerR.position.set(0.6, 0.2, 0); santaGroup.add(runnerR);
 
-        // Santa Body
         const torso = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.55, 0.9, 16), santaRedMat);
-        torso.position.set(0, 1.1, -0.1);
-        torso.castShadow = true;
-        santaGroup.add(torso);
+        torso.position.set(0, 1.1, -0.1); torso.castShadow = true; santaGroup.add(torso);
 
-        // Belt
-        const belt = new THREE.Mesh(new THREE.CylinderGeometry(0.56, 0.56, 0.15, 16), new THREE.MeshStandardMaterial({ color: 0x0f172a }));
-        belt.position.set(0, 0.95, -0.1);
-        santaGroup.add(belt);
-
-        // Head & Beard
         const head = new THREE.Mesh(new THREE.SphereGeometry(0.35, 16, 16), skinMat);
-        head.position.set(0, 1.75, -0.1);
-        head.castShadow = true;
-        santaGroup.add(head);
+        head.position.set(0, 1.75, -0.1); head.castShadow = true; santaGroup.add(head);
 
         const beard = new THREE.Mesh(new THREE.SphereGeometry(0.38, 16, 16), whiteFurMat);
-        beard.position.set(0, 1.65, 0.08);
-        santaGroup.add(beard);
+        beard.position.set(0, 1.65, 0.08); santaGroup.add(beard);
 
-        // Hat
         const hat = new THREE.Mesh(new THREE.ConeGeometry(0.38, 0.7, 16), santaRedMat);
-        hat.position.set(0, 2.2, -0.15);
-        hat.rotation.x = -0.3;
-        santaGroup.add(hat);
-
-        const pompom = new THREE.Mesh(new THREE.SphereGeometry(0.12, 16, 16), whiteFurMat);
-        pompom.position.set(0, 2.5, -0.3);
-        santaGroup.add(pompom);
+        hat.position.set(0, 2.2, -0.15); hat.rotation.x = -0.3; santaGroup.add(hat);
 
         scene.add(santaGroup);
 
-        // --- 7. GAME LOGIC ---
+        // --- 7. GAME STATE & FIX MOVEMENT LOGIC ---
         let gameRunning = false;
-        let score = 0;
-        let distance = 0;
-        let speed = 0.38;
+        let score = 0, distance = 0, speed = 0.38;
         const lanes = [-3.2, 0, 3.2];
         let currentLane = 1;
 
-        let isJumping = false;
-        let jumpVelocity = 0;
+        let isJumping = false, jumpVelocity = 0;
         const gravity = 0.016;
 
-        let obstacles = [];
-        let gifts = [];
+        let obstacles = [], gifts = [];
 
-        function spawnEntities() {
-            if (!gameRunning) return;
-
-            const laneIdx = Math.floor(Math.random() * lanes.length);
-            const xPos = lanes[laneIdx];
-            const zPos = -130;
-
-            if (Math.random() < 0.6) {
-                // Obstacle (Rock / Ice Block)
-                const obsGroup = new THREE.Group();
-                const rock = new THREE.Mesh(new THREE.DodecahedronGeometry(0.85), new THREE.MeshStandardMaterial({ color: 0x64748b, roughness: 0.9 }));
-                rock.position.y = 0.6;
-                rock.castShadow = true;
-                obsGroup.add(rock);
-
-                obsGroup.position.set(xPos, 0, zPos);
-                scene.add(obsGroup);
-                obstacles.push(obsGroup);
-            } else {
-                // Gift Box
-                const giftGroup = new THREE.Group();
-                const box = new THREE.Mesh(new THREE.BoxGeometry(0.85, 0.85, 0.85), giftMat);
-                box.position.y = 0.6;
-                box.castShadow = true;
-                giftGroup.add(box);
-
-                const ribbon = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.9, 0.2), goldMat);
-                ribbon.position.y = 0.6;
-                giftGroup.add(ribbon);
-
-                giftGroup.position.set(xPos, 0, zPos);
-                scene.add(giftGroup);
-                gifts.push(giftGroup);
+        function moveLeft() {
+            if (gameRunning && currentLane > 0) {
+                currentLane--;
             }
         }
 
-        // Controls
-        function moveLeft() {
-            if (gameRunning && currentLane > 0) currentLane--;
-        }
-
         function moveRight() {
-            if (gameRunning && currentLane < 2) currentLane--;
-            if (gameRunning && currentLane < 2) currentLane++;
+            if (gameRunning && currentLane < 2) {
+                currentLane++;
+            }
         }
 
         function jump() {
             if (gameRunning && !isJumping) {
                 isJumping = true;
                 jumpVelocity = 0.33;
-                sfx.playJump();
+                sfx.jump();
             }
         }
 
-        document.getElementById('btn-left').addEventListener('pointerdown', (e) => { e.preventDefault(); moveLeft(); });
-        document.getElementById('btn-right').addEventListener('pointerdown', (e) => { e.preventDefault(); moveRight(); });
-        document.getElementById('btn-jump').addEventListener('pointerdown', (e) => { e.preventDefault(); jump(); });
+        // BIND EVENT LISTENERS CHO CẢ MÁY TÍNH VÀ CẢM ỨNG DI ĐỘNG
+        const btnL = document.getElementById('btn-left');
+        const btnR = document.getElementById('btn-right');
+        const btnJ = document.getElementById('btn-jump');
+
+        const bindTrigger = (elem, fn) => {
+            elem.addEventListener('pointerdown', (e) => { e.preventDefault(); fn(); });
+            elem.addEventListener('touchstart', (e) => { e.preventDefault(); fn(); }, {passive: false});
+        };
+
+        bindTrigger(btnL, moveLeft);
+        bindTrigger(btnR, moveRight);
+        bindTrigger(btnJ, jump);
 
         window.addEventListener('keydown', (e) => {
             if (!gameRunning) return;
@@ -568,45 +459,69 @@ game_html = """
             if (e.key === ' ' || e.key === 'ArrowUp' || e.key === 'w') jump();
         });
 
+        // --- 8. SPAWN LOGIC ---
+        function spawnEntities() {
+            if (!gameRunning) return;
+            const laneIdx = Math.floor(Math.random() * lanes.length);
+            const xPos = lanes[laneIdx];
+            const zPos = -130;
+
+            if (Math.random() < 0.6) {
+                const obsGroup = new THREE.Group();
+                const rock = new THREE.Mesh(new THREE.DodecahedronGeometry(0.85), new THREE.MeshStandardMaterial({ color: 0x64748b, roughness: 0.9 }));
+                rock.position.y = 0.6; rock.castShadow = true; obsGroup.add(rock);
+                obsGroup.position.set(xPos, 0, zPos); scene.add(obsGroup); obstacles.push(obsGroup);
+            } else {
+                const giftGroup = new THREE.Group();
+                const box = new THREE.Mesh(new THREE.BoxGeometry(0.85, 0.85, 0.85), giftMat);
+                box.position.y = 0.6; box.castShadow = true; giftGroup.add(box);
+                const ribbon = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.9, 0.2), goldMat);
+                ribbon.position.y = 0.6; giftGroup.add(ribbon);
+                giftGroup.position.set(xPos, 0, zPos); scene.add(giftGroup); gifts.push(giftGroup);
+            }
+        }
+
         function startGame() {
             sfx.init();
             document.getElementById('start-screen').style.display = 'none';
             document.getElementById('gameover-screen').style.display = 'none';
-            score = 0;
-            distance = 0;
-            speed = 0.38;
-            currentLane = 1;
+            score = 0; distance = 0; speed = 0.38; currentLane = 1;
+            santaGroup.position.set(lanes[1], 0, 0);
 
             obstacles.forEach(o => scene.remove(o));
             gifts.forEach(g => scene.remove(g));
-            obstacles = [];
-            gifts = [];
-
+            obstacles = []; gifts = [];
             gameRunning = true;
         }
 
-        function restartGame() {
-            startGame();
-        }
+        function restartGame() { startGame(); }
 
-        setInterval(spawnEntities, 900);
+        setInterval(spawnEntities, 950);
 
+        // --- 9. MAIN ANIMATION LOOP ---
         function animate() {
             requestAnimationFrame(animate);
 
-            if (gameRunning) {
-                distance += 0.85;
-                speed += 0.00009;
+            // Xử lý tuyết rơi bầu trời liên tục
+            const pos = snowGeo.attributes.position.array;
+            for(let i = 0; i < snowCount; i++) {
+                pos[i*3 + 1] -= snowSpeeds[i].y;
+                pos[i*3] += snowSpeeds[i].x;
+                if(pos[i*3 + 1] < 0) pos[i*3 + 1] = 40;
+            }
+            snowGeo.attributes.position.needsUpdate = true;
 
+            if (gameRunning) {
+                distance += 0.85; speed += 0.00008;
                 document.getElementById('distance').innerText = Math.floor(distance / 10);
                 document.getElementById('score').innerText = score;
 
-                // Smooth Lane Switching
+                // Di chuyển mượt sang làn
                 const targetX = lanes[currentLane];
-                santaGroup.position.x += (targetX - santaGroup.position.x) * 0.22;
-                santaGroup.rotation.z = (santaGroup.position.x - targetX) * 0.08;
+                santaGroup.position.x += (targetX - santaGroup.position.x) * 0.25;
+                santaGroup.rotation.z = (santaGroup.position.x - targetX) * 0.06;
 
-                // Jump Physics
+                // Vật lý nhảy
                 if (isJumping) {
                     santaGroup.position.y += jumpVelocity;
                     jumpVelocity -= gravity;
@@ -618,21 +533,21 @@ game_html = """
 
                 santaLight.position.set(santaGroup.position.x, santaGroup.position.y + 2, santaGroup.position.z);
 
-                // Side scenery movement
+                // Cảnh quan di chuyển
                 sideDecorations.forEach(dec => {
                     dec.position.z += speed;
                     if (dec.position.z > 20) dec.position.z -= 220;
                 });
 
-                // Obstacles Logic
+                // Chướng ngại vật
                 for (let i = obstacles.length - 1; i >= 0; i--) {
                     obstacles[i].position.z += speed;
-
                     let dx = santaGroup.position.x - obstacles[i].position.x;
                     let dz = santaGroup.position.z - obstacles[i].position.z;
+
                     if (Math.abs(dx) < 0.95 && Math.abs(dz) < 0.95 && santaGroup.position.y < 1.1) {
                         gameRunning = false;
-                        sfx.playCrash();
+                        sfx.crash();
                         document.getElementById('final-score').innerText = score;
                         document.getElementById('gameover-screen').style.display = 'flex';
                     }
@@ -643,16 +558,17 @@ game_html = """
                     }
                 }
 
-                // Gifts Logic
+                // Hộp quà
                 for (let i = gifts.length - 1; i >= 0; i--) {
                     gifts[i].position.z += speed;
                     gifts[i].rotation.y += 0.05;
 
                     let dx = santaGroup.position.x - gifts[i].position.x;
                     let dz = santaGroup.position.z - gifts[i].position.z;
+
                     if (Math.abs(dx) < 1.05 && Math.abs(dz) < 1.05) {
                         score += 10;
-                        sfx.playBell();
+                        sfx.bell();
                         scene.remove(gifts[i]);
                         gifts.splice(i, 1);
                     } else if (gifts[i].position.z > 15) {
@@ -677,5 +593,5 @@ game_html = """
 </html>
 """
 
-# Hiển thị game trên Streamlit
+# Render trong Streamlit
 components.html(game_html, height=750, scrolling=False)
