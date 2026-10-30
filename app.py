@@ -222,7 +222,7 @@ game_html = """
     <!-- Màn Hình Khởi Đầu -->
     <div id="start-screen">
         <h1>🎄 SANTA CINEMATIC DASH 3D</h1>
-        <p>Đồ họa siêu chân thực cao cấp! Khám phá con đường tuyết trắng lung linh với rừng thông tự nhiên và người tuyết cực kỳ sống động.<br><br><b>Cách chơi:</b> Dùng phím <b>Mũi tên Trái / Phải / A / D</b> hoặc nút cảm ứng để đổi làn, phím <b>Cách (Space) / Lên</b> để nhảy.</p>
+        <p>Đồ họa siêu chân thực cao cấp! Cây chướng ngại vật đã được thu nhỏ gọn gàng giúp dễ dàng quan sát đường chạy.<br><br><b>Cách chơi:</b> Dùng phím <b>Mũi tên Trái / Phải / A / D</b> hoặc nút cảm ứng để đổi làn, phím <b>Cách (Space) / Lên</b> để nhảy.</p>
         <button class="btn" onclick="startGame()">BẮT ĐẦU CHƠI 🚀</button>
     </div>
 
@@ -431,8 +431,8 @@ game_html = """
         const bankRight = new THREE.Mesh(new THREE.BoxGeometry(32, 2.2, 300), snowGroundMat);
         bankRight.position.set(24, 0, -100); bankRight.receiveShadow = true; scene.add(bankRight);
 
-        // --- HÀM TẠO CÂY THÔNG CHUẨN PHOTOREALISTIC (DÙNG CHUNG CHO CẢ 2 BÊN & CHƯỚNG NGẠI VẬT) ---
-        function createPhotorealisticPineTree() {
+        // --- HÀM TẠO CÂY THÔNG 2 BÊN ĐƯỜNG (CỠ LỚN) ---
+        function createSceneryPineTree() {
             const tree = new THREE.Group();
             const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.55, 2.8), woodTrunkMat);
             trunk.position.y = 1.4; trunk.castShadow = true; tree.add(trunk);
@@ -447,10 +447,26 @@ game_html = """
             return tree;
         }
 
+        // --- HÀM TẠO CÂY THÔNG CHƯỚNG NGẠI VẬT (ĐÃ LÙN XUỐNG ĐỂ KHÔNG CHE TẦM NHÌN) ---
+        function createObstaclePineTree() {
+            const tree = new THREE.Group();
+            const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.4, 1.2), woodTrunkMat);
+            trunk.position.y = 0.6; trunk.castShadow = true; tree.add(trunk);
+            
+            for(let i = 0; i < 3; i++) {
+                const cone = new THREE.Mesh(new THREE.ConeGeometry(1.5 - i*0.3, 1.4, 12), pineLeafMat);
+                cone.position.y = 1.2 + i * 0.7; cone.castShadow = true; tree.add(cone);
+                
+                const snowCap = new THREE.Mesh(new THREE.ConeGeometry(1.3 - i*0.25, 0.4, 12), snowCapMat);
+                snowCap.position.y = 1.9 + i * 0.7; tree.add(snowCap);
+            }
+            return tree;
+        }
+
         const sideDecorations = [];
         for(let z = -200; z < 20; z += 10) {
-            const treeL = createPhotorealisticPineTree(); treeL.position.set(-11 - Math.random()*9, 0, z); scene.add(treeL); sideDecorations.push(treeL);
-            const treeR = createPhotorealisticPineTree(); treeR.position.set(11 + Math.random()*9, 0, z + 5); scene.add(treeR); sideDecorations.push(treeR);
+            const treeL = createSceneryPineTree(); treeL.position.set(-11 - Math.random()*9, 0, z); scene.add(treeL); sideDecorations.push(treeL);
+            const treeR = createSceneryPineTree(); treeR.position.set(11 + Math.random()*9, 0, z + 5); scene.add(treeR); sideDecorations.push(treeR);
         }
 
         // --- 6. XE TRƯỢT & BẦY TUẦN LỘC ---
@@ -589,8 +605,8 @@ game_html = """
                 const type = Math.random();
 
                 if (type < 0.35) {
-                    // Cây thông chướng ngại vật nay dùng chung hàm với rừng cây 2 bên cho cực kỳ chân thực
-                    const obstacleTree = createPhotorealisticPineTree();
+                    // Cây thông cản đường (phiên bản lùn gọn gàng, không che tầm nhìn)
+                    const obstacleTree = createObstaclePineTree();
                     obsGroup.add(obstacleTree);
                 } else if (type < 0.75) {
                     // --- NGƯỜI TUYẾT SỐNG ĐỘNG NHƯ THẬT ---
