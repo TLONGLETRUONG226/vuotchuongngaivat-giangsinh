@@ -3,7 +3,7 @@ import streamlit.components.v1 as components
 
 # Cấu hình Streamlit tràn màn hình
 st.set_page_config(
-    page_title="Santa's Reindeer Herd 3D Dash",
+    page_title="Santa's Reindeer Herd 3D Dash - 3 Lanes",
     page_icon="🦌",
     layout="wide",
     initial_sidebar_state="collapsed"
@@ -218,7 +218,7 @@ game_html = """
     <!-- Screens -->
     <div id="start-screen">
         <h1>🦌 SANTA'S REINDEER HERD DASH</h1>
-        <p>Bầy tuần lộc hùng hậu đã sẵn sàng kéo xe cho ông già Noel! Tránh các chướng ngại vật lớn và đa dạng trên đường băng.<br><br><b>Điều khiển:</b> Nút cảm ứng hoặc dùng phím <b>Mũi tên Trái / Phải / A / D</b> để chuyển làn (Trái - Giữa - Phải), <b>Phím Cách / Lên</b> để nhảy qua chướng ngại vật.</p>
+        <p>Bầy tuần lộc hùng hậu kéo xe cho ông già Noel! Tránh chướng ngại vật lớn và đa dạng trên đường băng.<br><br><b>Điều khiển:</b> Nút cảm ứng hoặc dùng phím <b>Mũi tên Trái / Phải / A / D</b> để di chuyển linh hoạt qua <b>3 làn (Trái - Giữa - Phải)</b>, <b>Phím Cách / Lên</b> để nhảy.</p>
         <button class="btn" onclick="startGame()">BẮT ĐẦU CHƠI 🎄</button>
     </div>
 
@@ -411,10 +411,9 @@ game_html = """
             const treeR = createPineTree(); treeR.position.set(8.5 + Math.random()*8, 1, z + 5); scene.add(treeR); sideDecorations.push(treeR);
         }
 
-        // --- 6. SANTA & REINDEER HERD 3D MODEL (BẦY TUẦN LỘC KÉO XE) ---
+        // --- 6. SANTA & REINDEER HERD 3D MODEL ---
         const santaGroup = new THREE.Group();
 
-        // 6.1 Xe trượt tuyết (Sleigh) ở phía sau
         const sleigh = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.5, 2), santaRedMat);
         sleigh.position.set(0, 0.4, 1.2);
         sleigh.castShadow = true;
@@ -425,7 +424,6 @@ game_html = """
         const runnerR = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.15, 2.4), goldMat);
         runnerR.position.set(0.6, 0.15, 1.2); santaGroup.add(runnerR);
 
-        // Ông già Noel ngồi trên xe
         const santaTorso = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.4, 0.7), santaRedMat);
         santaTorso.position.set(0, 0.8, 1.0); santaTorso.castShadow = true; santaGroup.add(santaTorso);
 
@@ -441,7 +439,6 @@ game_html = """
         const sack = new THREE.Mesh(new THREE.SphereGeometry(0.45, 16, 16), new THREE.MeshStandardMaterial({color: 0x16a34a, roughness: 0.7}));
         sack.position.set(0, 0.8, 1.7); santaGroup.add(sack);
 
-        // 6.2 Bầy tuần lộc (Reindeer Herd gồm 4 con xếp thành 2 hàng) kéo xe phía trước
         function createSingleReindeer(x, z) {
             const deer = new THREE.Group();
             const body = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.6, 1.3), deerMat);
@@ -459,13 +456,11 @@ game_html = """
             return deer;
         }
 
-        // Tạo bầy 4 con tuần lộc
         santaGroup.add(createSingleReindeer(-0.5, -0.8));
         santaGroup.add(createSingleReindeer(0.5, -0.8));
         santaGroup.add(createSingleReindeer(-0.5, -2.2));
         santaGroup.add(createSingleReindeer(0.5, -2.2));
 
-        // Đèn pha chiếu sáng trước xe
         const headlight = new THREE.SpotLight(0xfffae0, 2.5, 35, Math.PI / 5, 0.4);
         headlight.position.set(0, 1, -1.0);
         headlight.target.position.set(0, 0.5, -12);
@@ -474,13 +469,13 @@ game_html = """
 
         scene.add(santaGroup);
 
-        // --- 7. CHUẨN XÁC 3 LÀN ĐƯỜNG & ĐIỀU KHIỂN ---
+        // --- 7. CHUẨN XÁC 3 LÀN ĐƯỜNG RIÊNG BIỆT ---
         let gameRunning = false;
         let score = 0, distance = 0, speed = 0.38;
         
-        // 3 Làn đường rõ ràng: Làn Trái = -3.5, Làn Giữa = 0, Làn Phải = 3.5
-        const lanes = [-3.5, 0, 3.5];
-        let currentLane = 1; // Bắt đầu ở giữa
+        // 3 Làn đường tuyệt đối: [Làn Trái = -4.0, Làn Giữa = 0, Làn Phải = 4.0]
+        const lanes = [-4.0, 0, 4.0];
+        let currentLane = 1; // Bắt đầu ở làn giữa (Index 1)
 
         let isJumping = false, jumpVelocity = 0;
         const gravity = 0.016;
@@ -488,19 +483,22 @@ game_html = """
         let obstacles = [], gifts = [];
 
         function moveLeft() {
-            if (gameRunning && currentLane > 0) {
-                currentLane--; // Chuyển sang trái
+            if (!gameRunning) return;
+            if (currentLane > 0) {
+                currentLane--; // Giảm chỉ số (từ 1 về 0, hoặc từ 2 về 1)
             }
         }
 
         function moveRight() {
-            if (gameRunning && currentLane < 2) {
-                currentLane++; // Chuyển sang phải
+            if (!gameRunning) return;
+            if (currentLane < 2) {
+                currentLane++; // Tăng chỉ số (từ 0 lên 1, hoặc từ 1 lên 2)
             }
         }
 
         function jump() {
-            if (gameRunning && !isJumping) {
+            if (!gameRunning) return;
+            if (!isJumping) {
                 isJumping = true;
                 jumpVelocity = 0.33;
                 audio.jump();
@@ -528,7 +526,7 @@ game_html = """
             if (e.key === ' ' || e.key === 'ArrowUp' || e.key === 'w') jump();
         });
 
-        // --- 8. CHƯỚNG NGẠI VẬT ĐA DẠNG & LỚN HƠN ---
+        // --- 8. SPAWN ENTITIES ---
         function spawnEntities() {
             if (!gameRunning) return;
             const laneIdx = Math.floor(Math.random() * lanes.length);
@@ -537,24 +535,20 @@ game_html = """
 
             const randType = Math.random();
             if (randType < 0.6) {
-                // Chướng ngại vật đa dạng (Cây thông lớn, Người tuyết, hoặc Tảng băng khổng lồ)
                 const obsGroup = new THREE.Group();
                 const type = Math.random();
 
                 if (type < 0.35) {
-                    // Cây thông Noel khổng lồ làm vật cản
                     const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.6, 1.5), woodMat);
                     trunk.position.y = 0.75; trunk.castShadow = true; obsGroup.add(trunk);
                     const cone = new THREE.Mesh(new THREE.ConeGeometry(1.6, 3.5, 8), leafMat);
                     cone.position.y = 2.5; cone.castShadow = true; obsGroup.add(cone);
                 } else if (type < 0.7) {
-                    // Người tuyết khổng lồ
                     const body = new THREE.Mesh(new THREE.SphereGeometry(1.2, 16, 16), snowGroundMat);
                     body.position.y = 1.0; body.castShadow = true; obsGroup.add(body);
                     const head = new THREE.Mesh(new THREE.SphereGeometry(0.75, 16, 16), snowGroundMat);
                     head.position.y = 2.3; head.castShadow = true; obsGroup.add(head);
                 } else {
-                    // Tảng băng khổng lồ sắc nhọn
                     const rock = new THREE.Mesh(new THREE.DodecahedronGeometry(1.3), new THREE.MeshStandardMaterial({ color: 0x64748b, roughness: 0.8 }));
                     rock.position.y = 1.0; rock.castShadow = true; obsGroup.add(rock);
                 }
@@ -563,7 +557,6 @@ game_html = """
                 scene.add(obsGroup);
                 obstacles.push(obsGroup);
             } else {
-                // Hộp quà lớn thưởng điểm
                 const giftGroup = new THREE.Group();
                 const box = new THREE.Mesh(new THREE.BoxGeometry(1.1, 1.1, 1.1), giftMat);
                 box.position.y = 0.6; box.castShadow = true; giftGroup.add(box);
@@ -598,7 +591,6 @@ game_html = """
         function animate() {
             requestAnimationFrame(animate);
 
-            // Hiệu ứng tuyết rơi
             const pos = snowGeo.attributes.position.array;
             for(let i = 0; i < snowCount; i++) {
                 pos[i*3 + 1] -= snowSpeeds[i].y;
@@ -612,9 +604,9 @@ game_html = """
                 document.getElementById('distance').innerText = Math.floor(distance / 10);
                 document.getElementById('score').innerText = score;
 
-                // Di chuyển mượt sang làn mục tiêu
+                // Di chuyển mượt mà tuyệt đối sang đúng 3 vị trí làn (Trái: -4.0, Giữa: 0, Phải: 4.0)
                 const targetX = lanes[currentLane];
-                santaGroup.position.x += (targetX - santaGroup.position.x) * 0.22;
+                santaGroup.position.x += (targetX - santaGroup.position.x) * 0.25;
                 santaGroup.rotation.z = (santaGroup.position.x - targetX) * 0.05;
 
                 // Vật lý nhảy
@@ -627,19 +619,18 @@ game_html = """
                     }
                 }
 
-                // Cảnh quan hai bên chạy
                 sideDecorations.forEach(dec => {
                     dec.position.z += speed;
                     if (dec.position.z > 20) dec.position.z -= 220;
                 });
 
-                // Kiểm tra va chạm chướng ngại vật
+                // Va chạm chướng ngại vật
                 for (let i = obstacles.length - 1; i >= 0; i--) {
                     obstacles[i].position.z += speed;
                     let dx = santaGroup.position.x - obstacles[i].position.x;
                     let dz = santaGroup.position.z - obstacles[i].position.z;
 
-                    if (Math.abs(dx) < 1.25 && Math.abs(dz) < 1.4 && santaGroup.position.y < 1.2) {
+                    if (Math.abs(dx) < 1.3 && Math.abs(dz) < 1.4 && santaGroup.position.y < 1.2) {
                         gameRunning = false;
                         audio.stopBGM();
                         audio.crash();
@@ -653,7 +644,7 @@ game_html = """
                     }
                 }
 
-                // Kiểm tra ăn quà
+                // Ăn quà
                 for (let i = gifts.length - 1; i >= 0; i--) {
                     gifts[i].position.z += speed;
                     gifts[i].rotation.y += 0.05;
@@ -661,7 +652,7 @@ game_html = """
                     let dx = santaGroup.position.x - gifts[i].position.x;
                     let dz = santaGroup.position.z - gifts[i].position.z;
 
-                    if (Math.abs(dx) < 1.3 && Math.abs(dz) < 1.3) {
+                    if (Math.abs(dx) < 1.35 && Math.abs(dz) < 1.35) {
                         score += 10;
                         audio.bell();
                         scene.remove(gifts[i]);
