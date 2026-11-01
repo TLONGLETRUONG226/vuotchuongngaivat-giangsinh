@@ -3,8 +3,8 @@ import streamlit.components.v1 as components
 
 # Cấu hình Streamlit tràn màn hình
 st.set_page_config(
-    page_title="Santa's Ultra Reindeer Squad 3D",
-    page_icon="🦌",
+    page_title="Ông Già Noel Vượt Chướng Ngại Vật 3D",
+    page_icon="🎅",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
@@ -30,7 +30,7 @@ game_html = """
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Santa Ultra Reindeer Squad 3D</title>
+    <title>Ông Già Noel Vượt Chướng Ngại Vật 3D</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@700;800;900&family=Comfortaa:wght@700&display=swap');
 
@@ -99,7 +99,7 @@ game_html = """
             left: 0;
             width: 100%;
             height: 100%;
-            background: radial-gradient(circle at center, rgba(15, 23, 42, 0.9) 0%, rgba(1, 4, 9, 0.99) 100%);
+            background: radial-gradient(circle at center, rgba(15, 23, 42, 0.92) 0%, rgba(1, 4, 9, 0.99) 100%);
             backdrop-filter: blur(20px);
             display: flex;
             flex-direction: column;
@@ -114,19 +114,26 @@ game_html = """
         h1 {
             font-family: 'Be Vietnam Pro', sans-serif;
             font-weight: 900;
-            font-size: 46px;
+            font-size: 44px;
             background: linear-gradient(135deg, #38bdf8 0%, #facc15 50%, #ef4444 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 12px;
+            margin-bottom: 6px;
             filter: drop-shadow(0 15px 25px rgba(56, 189, 248, 0.6));
         }
+        .subtitle {
+            font-size: 19px;
+            color: #facc15;
+            font-weight: 800;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 10px rgba(250, 204, 21, 0.4);
+        }
         p {
-            font-size: 18px;
+            font-size: 17px;
             color: #cbd5e1;
-            max-width: 600px;
+            max-width: 620px;
             line-height: 1.6;
-            margin-bottom: 32px;
+            margin-bottom: 30px;
             font-weight: 700;
         }
         .btn {
@@ -221,8 +228,9 @@ game_html = """
 
     <!-- Màn Hình Khởi Đầu -->
     <div id="start-screen">
-        <h1>🦌 ĐỘI TUẦN LỘC SANTA ULTRA 3D</h1>
-        <p>Bầy 8 con tuần lộc dũng mãnh kéo xe trượt! Cây thông chướng ngại vật cao vừa tầm - không thể nhảy qua, hãy nhanh tay chuyển làn!<br><br><b>Cách chơi:</b> Dùng phím <b>Mũi tên Trái / Phải / A / D</b> hoặc nút cảm ứng để đổi làn, phím <b>Cách (Space) / Lên</b> để nhảy.</p>
+        <h1>🎅 ÔNG GIÀ NOEL VƯỢT CHƯỚNG NGẠI VẬT</h1>
+        <div class="subtitle">hãy giúp ông vượt chướng ngại vật để ông phát quà nhé</div>
+        <p>Bầy 8 con tuần lộc dũng mãnh kéo xe trượt! Các vật cản như cây thông và người tuyết không thể nhảy qua - hãy chuyển làn nhanh tay để tránh nhé!<br><br><b>Cách chơi:</b> Dùng phím <b>Mũi tên Trái / Phải / A / D</b> hoặc nút cảm ứng để đổi làn, phím <b>Cách (Space) / Lên</b> để nhảy.</p>
         <button class="btn" onclick="startGame()">BẮT ĐẦU CHƠI 🚀</button>
     </div>
 
@@ -445,18 +453,18 @@ game_html = """
             return tree;
         }
 
-        // CÂY THÔNG CHƯỚNG NGẠI VẬT (CAO VỪA VẶN - KHÔNG THỂ NHẢY QUA NHƯNG DỄ QUAN SÁT)
+        // CÂY THÔNG CHƯỚNG NGẠI VẬT (GỌN DỄ NHÌN ĐƯỜNG CHẠY NHƯNG TUYỆT ĐỐI KHÔNG THỂ NHẢY QUA)
         function createObstaclePineTree() {
             const tree = new THREE.Group();
-            const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.48, 1.8), woodTrunkMat);
-            trunk.position.y = 0.9; trunk.castShadow = true; tree.add(trunk);
+            const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.42, 1.4), woodTrunkMat);
+            trunk.position.y = 0.7; trunk.castShadow = true; tree.add(trunk);
             
             for(let i = 0; i < 3; i++) {
-                const cone = new THREE.Mesh(new THREE.ConeGeometry(1.8 - i*0.35, 2.0, 12), pineLeafMat);
-                cone.position.y = 1.6 + i * 0.9; cone.castShadow = true; tree.add(cone);
+                const cone = new THREE.Mesh(new THREE.ConeGeometry(1.65 - i*0.3, 1.6, 12), pineLeafMat);
+                cone.position.y = 1.3 + i * 0.75; cone.castShadow = true; tree.add(cone);
                 
-                const snowCap = new THREE.Mesh(new THREE.ConeGeometry(1.55 - i*0.3, 0.5, 12), snowCapMat);
-                snowCap.position.y = 2.4 + i * 0.9; tree.add(snowCap);
+                const snowCap = new THREE.Mesh(new THREE.ConeGeometry(1.4 - i*0.25, 0.45, 12), snowCapMat);
+                snowCap.position.y = 2.0 + i * 0.75; tree.add(snowCap);
             }
             return tree;
         }
@@ -732,7 +740,8 @@ game_html = """
                     let dx = santaGroup.position.x - obstacles[i].position.x;
                     let dz = santaGroup.position.z - obstacles[i].position.z;
 
-                    if (Math.abs(dx) < 1.3 && Math.abs(dz) < 1.4 && santaGroup.position.y < 2.2) {
+                    // KIỂM TRA VA CHẠM: Giới hạn độ cao y < 3.2m đảm bảo nhảy không qua được vật cản
+                    if (Math.abs(dx) < 1.3 && Math.abs(dz) < 1.4 && santaGroup.position.y < 3.2) {
                         gameRunning = false;
                         audio.stopBGM();
                         audio.crashBoomCinematic();
