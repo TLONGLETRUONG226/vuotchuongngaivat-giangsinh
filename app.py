@@ -99,8 +99,8 @@ game_html = """
             left: 0;
             width: 100%;
             height: 100%;
-            background: radial-gradient(circle at center, rgba(15, 23, 42, 0.92) 0%, rgba(1, 4, 9, 0.99) 100%);
-            backdrop-filter: blur(20px);
+            background: radial-gradient(circle at center, rgba(15, 23, 42, 0.94) 0%, rgba(1, 4, 9, 0.99) 100%);
+            backdrop-filter: blur(22px);
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -114,34 +114,76 @@ game_html = """
         h1 {
             font-family: 'Be Vietnam Pro', sans-serif;
             font-weight: 900;
-            font-size: 44px;
+            font-size: 42px;
             background: linear-gradient(135deg, #38bdf8 0%, #facc15 50%, #ef4444 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
             filter: drop-shadow(0 15px 25px rgba(56, 189, 248, 0.6));
         }
         .subtitle {
-            font-size: 19px;
+            font-size: 18px;
             color: #facc15;
             font-weight: 800;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             text-shadow: 0 2px 10px rgba(250, 204, 21, 0.4);
         }
         p {
-            font-size: 17px;
+            font-size: 16px;
             color: #cbd5e1;
             max-width: 620px;
-            line-height: 1.6;
-            margin-bottom: 30px;
+            line-height: 1.5;
+            margin-bottom: 20px;
             font-weight: 700;
         }
+
+        /* Lựa chọn độ khó */
+        .difficulty-container {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 22px;
+        }
+        .diff-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 10px 22px;
+            border-radius: 20px;
+            font-size: 16px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .diff-btn.active {
+            background: #38bdf8;
+            border-color: #38bdf8;
+            color: #010409;
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.8);
+        }
+
+        /* Nút Tùy Chọn Âm Thanh */
+        .audio-toggle-container {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            color: #94a3b8;
+            cursor: pointer;
+        }
+        .audio-toggle-container input {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
         .btn {
             background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
             color: white;
             border: none;
-            padding: 20px 60px;
-            font-size: 22px;
+            padding: 18px 55px;
+            font-size: 21px;
             font-family: 'Be Vietnam Pro', sans-serif;
             font-weight: 800;
             border-radius: 50px;
@@ -230,7 +272,21 @@ game_html = """
     <div id="start-screen">
         <h1>🎅 ÔNG GIÀ NOEL VƯỢT CHƯỚNG NGẠI VẬT</h1>
         <div class="subtitle">hãy giúp ông vượt chướng ngại vật để ông phát quà nhé</div>
-        <p>Đội 10 con tuần lộc dũng mãnh kéo xe trượt! Cây thông và người tuyết rất cao - bắt buộc phải đổi làn để né. Riêng cục đá thấp hơn có thể dùng phím Nhảy để bay qua!<br><br><b>Cách chơi:</b> Dùng phím <b>Mũi tên Trái / Phải / A / D</b> hoặc nút cảm ứng để đổi làn, phím <b>Cách (Space) / Lên</b> để nhảy.</p>
+        
+        <!-- Chọn mức độ khó -->
+        <div class="difficulty-container">
+            <button class="diff-btn active" id="diff-easy" onclick="setDifficulty('easy')">🟢 Dễ</button>
+            <button class="diff-btn" id="diff-medium" onclick="setDifficulty('medium')">🟡 Trung Bình</button>
+            <button class="diff-btn" id="diff-hard" onclick="setDifficulty('hard')">🔴 Khó</button>
+        </div>
+
+        <!-- Tùy chọn Âm thanh -->
+        <div class="audio-toggle-container">
+            <input type="checkbox" id="audio-checkbox" checked onchange="toggleAudioSetting()">
+            <label for="audio-checkbox">🔊 Bật Âm Thanh</label>
+        </div>
+
+        <p>Đội 10 tuần lộc dũng mãnh! Cây thông và người tuyết cực cao bắt buộc phải đổi làn né tránh. Riêng cục đá thấp hơn có thể dùng phím Nhảy để bay qua!<br><b>Cách chơi:</b> Dùng phím <b>Trái / Phải / A / D</b> để đổi làn, phím <b>Cách (Space) / Lên</b> để nhảy.</p>
         <button class="btn" onclick="startGame()">BẮT ĐẦU CHƠI 🚀</button>
     </div>
 
@@ -242,6 +298,376 @@ game_html = """
     </div>
 
     <script>
+        // --- CẤU HÌNH ĐỘ KHÓ & ÂM THANH ---
+        let selectedDifficulty = 'easy'; // 'easy', 'medium', 'hard'
+        let soundEnabled = true;
+
+        function setDifficulty(level) {
+            selectedDifficulty = level;
+            document.querySelectorAll('.diff-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('diff-' + level).classList.add('active');
+        }
+
+        function toggleAudioSetting() {
+            soundEnabled = document.getElementById('audio-checkbox').checked;
+        }
+
+        // --- 1. ÂM THANH NỔ CINEMATIC ---
+        class GameAudio {
+            constructor() {
+                this.ctx = null;
+                this.bgmTimer = null;
+                this.isPlaying = false;
+                this.notes = [
+                    {f: 659.25, d: 0.25}, {f: 659.25, d: 0.25}, {f: 659.25, d: 0.5},
+                    {f: 659.25, d: 0.25}, {f: 659.25, d: 0.25}, {f: 659.25, d: 0.5},
+                    {f: 659.25, d: 0.25}, {f: 783.99, d: 0.25}, {f: 523.25, d: 0.35}, {f: 587.33, d: 0.15}, {f: 659.25, d: 0.8},
+                    {f: 698.46, d: 0.25}, {f: 698.46, d: 0.25}, {f: 698.46, d: 0.35}, {f: 698.46, d: 0.15},
+                    {f: 698.46, d: 0.25}, {f: 659.25, d: 0.25}, {f: 659.25, d: 0.25}, {f: 659.25, d: 0.25},
+                    {f: 659.25, d: 0.25}, {f: 587.33, d: 0.25}, {Dưới đây là mã nguồn `app.py` đã được nâng cấp toàn diện với màn hình khởi đầu hoàn toàn mới, bao gồm:
+
+1. **3 Mức Độ Khó (Dễ, Trung Bình, Khó):**
+   * **Dễ:** Tốc độ ban đầu vừa phải, tăng tốc từ từ, nhẹ nhàng để làm quen.
+   * **Trung Bình:** Tốc độ nhanh hơn mức Dễ, nhịp độ thử thách hơn.
+   * **Khó:** Xe xuất phát với tốc độ cao và gia tốc tăng tốc liên tục cực kỳ dồn dập.
+2. **Nút Bật / Tắt Âm Thanh Trực Quan:** Ngay trên màn hình khởi đầu để bạn dễ dàng tùy chỉnh trải nghiệm âm nhạc và hiệu ứng.
+3. **Giữ nguyên toàn bộ hiệu ứng sinh động:** Bầy 10 tuần lộc sát nhau, chướng ngại vật phân rõ loại (đá nhảy qua được, cây/người tuyết không thể vượt qua), hiệu ứng lật xe, tuần lộc văng ra tứ tung và độ trễ 5 giây trước khi hiện bảng thua.
+
+Bạn hãy copy toàn bộ đoạn mã dưới đây và dán đè vào file `app.py` trên GitHub nhé:
+
+```python
+import streamlit as st
+import streamlit.components.v1 as components
+
+# Cấu hình Streamlit tràn màn hình
+st.set_page_config(
+    page_title="Ông Già Noel Vượt Chướng Ngại Vật 3D",
+    page_icon="🎅",
+    layout="wide",
+    initial_sidebar_state="collapsed"
+)
+
+# Ẩn header và footer mặc định của Streamlit
+st.markdown("""
+    <style>
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
+    .block-container {
+        padding: 0rem !important;
+    }
+    iframe {
+        border: none;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+game_html = """
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ông Già Noel Vượt Chướng Ngại Vật 3D</title>
+    <style>
+        @import url('[https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@700;800;900&family=Comfortaa:wght@700&display=swap](https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@700;800;900&family=Comfortaa:wght@700&display=swap)');
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+        }
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #010409;
+            font-family: 'Be Vietnam Pro', sans-serif;
+        }
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+            display: block;
+        }
+        
+        /* HUD UI Kính Mờ */
+        #ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 24px;
+            z-index: 10;
+        }
+        .hud-panel {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+        .score-box {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            padding: 14px 32px;
+            border-radius: 30px;
+            border: 2px solid rgba(255, 255, 255, 0.45);
+            color: #ffffff;
+            font-size: 24px;
+            font-family: 'Comfortaa', cursive;
+            font-weight: 700;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7), inset 0 2px 5px rgba(255,255,255,0.5);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        
+        /* Giao Diện Màn Hình Khởi Đầu & Thua Cuộc */
+        #start-screen, #gameover-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, rgba(15, 23, 42, 0.94) 0%, rgba(1, 4, 9, 0.99) 100%);
+            backdrop-filter: blur(22px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            pointer-events: auto;
+            color: white;
+            text-align: center;
+            z-index: 20;
+            padding: 28px;
+        }
+        h1 {
+            font-family: 'Be Vietnam Pro', sans-serif;
+            font-weight: 900;
+            font-size: 40px;
+            background: linear-gradient(135deg, #38bdf8 0%, #facc15 50%, #ef4444 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 4px;
+            filter: drop-shadow(0 15px 25px rgba(56, 189, 248, 0.6));
+        }
+        .subtitle {
+            font-size: 17px;
+            color: #facc15;
+            font-weight: 800;
+            margin-bottom: 16px;
+            text-shadow: 0 2px 10px rgba(250, 204, 21, 0.4);
+        }
+        p {
+            font-size: 15px;
+            color: #cbd5e1;
+            max-width: 600px;
+            line-height: 1.5;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+        
+        /* Cấu hình Chọn Mức Độ Khó & Âm Thanh */
+        .config-section {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 24px;
+            width: 100%;
+            max-width: 480px;
+        }
+        .config-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(30, 41, 59, 0.7);
+            padding: 10px 20px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .config-label {
+            font-size: 16px;
+            font-weight: 800;
+            color: #e2e8f0;
+        }
+        .btn-group {
+            display: flex;
+            gap: 8px;
+        }
+        .option-btn {
+            background: rgba(15, 23, 42, 0.8);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: #cbd5e1;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 800;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .option-btn.active {
+            background: #38bdf8;
+            color: #0f172a;
+            border-color: #38bdf8;
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.6);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
+            color: white;
+            border: none;
+            padding: 18px 50px;
+            font-size: 20px;
+            font-family: 'Be Vietnam Pro', sans-serif;
+            font-weight: 800;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 15px 40px rgba(56, 189, 248, 0.7), inset 0 2px 3px rgba(255,255,255,0.7);
+            transition: all 0.25s ease;
+            pointer-events: auto;
+        }
+        .btn:hover {
+            transform: translateY(-4px) scale(1.04);
+            box-shadow: 0 20px 45px rgba(56, 189, 248, 0.9);
+        }
+        
+        /* Phím Bấm Cảm Ứng */
+        #controls-wrapper {
+            position: absolute;
+            bottom: 30px;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 32px;
+            pointer-events: none;
+            z-index: 15;
+        }
+        .d-pad, .action-pad {
+            display: flex;
+            gap: 18px;
+            pointer-events: auto;
+        }
+        .ctrl-btn {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 2px solid rgba(255, 255, 255, 0.65);
+            color: white;
+            font-size: 32px;
+            width: 78px;
+            height: 78px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 12px 28px rgba(0,0,0,0.6);
+            touch-action: manipulation;
+        }
+        .ctrl-btn:active {
+            background: rgba(56, 189, 248, 0.9);
+            transform: scale(0.88);
+        }
+        .btn-jump {
+            width: 88px;
+            height: 88px;
+            background: rgba(249, 202, 36, 0.45);
+            border-color: rgba(249, 202, 36, 0.95);
+            font-size: 38px;
+        }
+    </style>
+    <script src="[https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js](https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js)"></script>
+</head>
+<body>
+
+    <div id="canvas-container"></div>
+
+    <div id="ui-layer">
+        <div class="hud-panel">
+            <div class="score-box">🎁 Quà: <span id="score">0</span></div>
+            <div class="score-box">⭐ Điểm: <span id="distance">0</span>m</div>
+        </div>
+    </div>
+
+    <!-- Nút Điều Khiển Màn Hình -->
+    <div id="controls-wrapper">
+        <div class="d-pad">
+            <div class="ctrl-btn" id="btn-left">⬅️</div>
+            <div class="ctrl-btn" id="btn-right">➡️</div>
+        </div>
+        <div class="action-pad">
+            <div class="ctrl-btn btn-jump" id="btn-jump">🚀</div>
+        </div>
+    </div>
+
+    <!-- Màn Hình Khởi Đầu -->
+    <div id="start-screen">
+        <h1>🎅 ÔNG GIÀ NOEL VƯỢT CHƯỚNG NGẠI VẬT</h1>
+        <div class="subtitle">hãy giúp ông vượt chướng ngại vật để ông phát quà nhé</div>
+        
+        <!-- Cấu hình Mức độ khó & Âm thanh -->
+        <div class="config-section">
+            <div class="config-row">
+                <span class="config-label">⚡ Mức độ:</span>
+                <div class="btn-group">
+                    <button class="option-btn active" id="diff-easy" onclick="setDifficulty('easy')">Dễ</button>
+                    <button class="option-btn" id="diff-medium" onclick="setDifficulty('medium')">Trung bình</button>
+                    <button class="option-btn" id="diff-hard" onclick="setDifficulty('hard')">Khó</button>
+                </div>
+            </div>
+            <div class="config-row">
+                <span class="config-label">🔊 Âm thanh:</span>
+                <div class="btn-group">
+                    <button class="option-btn active" id="sound-on" onclick="setSound(true)">Bật</button>
+                    <button class="option-btn" id="sound-off" onclick="setSound(false)">Tắt</button>
+                </div>
+            </div>
+        </div>
+
+        <p><b>Cách chơi:</b> Đổi làn né Cây thông & Người tuyết (quá cao không thể nhảy qua). Dùng phím Nhảy để vượt qua Cục đá!<br>Điều khiển: <b>Trái / Phải / A / D</b> hoặc nút màn hình. Nhảy: <b>Space / Lên</b>.</p>
+        <button class="btn" onclick="startGame()">BẮT ĐẦU CHƠI 🚀</button>
+    </div>
+
+    <!-- Màn Hình Thua -->
+    <div id="gameover-screen" style="display: none;">
+        <h1>💥 VA CHẠM CỰC MẠNH!</h1>
+        <p>Đã xảy ra va chạm trên đường băng tuyết!<br><br>🎁 Tổng số quà thu thập: <b><span id="final-score">0</span></b></p>
+        <button class="btn" onclick="restartGame()">CHƠI LẠI 🔄</button>
+    </div>
+
+    <script>
+        let selectedDifficulty = 'easy'; // 'easy', 'medium', 'hard'
+        let soundEnabled = true;
+
+        function setDifficulty(level) {
+            selectedDifficulty = level;
+            document.getElementById('diff-easy').classList.remove('active');
+            document.getElementById('diff-medium').classList.remove('active');
+            document.getElementById('diff-hard').classList.remove('active');
+            document.getElementById('diff-' + level).classList.add('active');
+        }
+
+        function setSound(status) {
+            soundEnabled = status;
+            document.getElementById('sound-on').classList.remove('active');
+            document.getElementById('sound-off').classList.remove('active');
+            if(status) {
+                document.getElementById('sound-on').classList.add('active');
+            } else {
+                document.getElementById('sound-off').classList.add('active');
+            }
+        }
+
         // --- 1. ÂM THANH NỔ "ĐÙNG!" CINEMATIC ---
         class GameAudio {
             constructor() {
@@ -259,10 +685,10 @@ game_html = """
                 this.idx = 0;
             }
             init() {
-                if (!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                if (!this.ctx && soundEnabled) this.ctx = new (window.AudioContext || window.webkitAudioContext)();
             }
             startBGM() {
-                if (this.isPlaying) return;
+                if (!soundEnabled || this.isPlaying) return;
                 this.isPlaying = true;
                 this.idx = 0;
                 this.loopBGM();
@@ -272,7 +698,7 @@ game_html = """
                 if (this.bgmTimer) clearTimeout(this.bgmTimer);
             }
             loopBGM() {
-                if (!this.isPlaying || !this.ctx) return;
+                if (!soundEnabled || !this.isPlaying || !this.ctx) return;
                 const n = this.notes[this.idx];
                 const osc = this.ctx.createOscillator(), g = this.ctx.createGain();
                 osc.type = 'sine';
@@ -285,7 +711,7 @@ game_html = """
                 this.bgmTimer = setTimeout(() => this.loopBGM(), n.d * 1000);
             }
             bell() {
-                if (!this.ctx) return;
+                if (!soundEnabled || !this.ctx) return;
                 const osc = this.ctx.createOscillator(), g = this.ctx.createGain();
                 osc.type = 'sine';
                 osc.frequency.setValueAtTime(1046.5, this.ctx.currentTime);
@@ -296,7 +722,7 @@ game_html = """
                 osc.start(); osc.stop(this.ctx.currentTime + 0.4);
             }
             jump() {
-                if (!this.ctx) return;
+                if (!soundEnabled || !this.ctx) return;
                 const osc = this.ctx.createOscillator(), g = this.ctx.createGain();
                 osc.type = 'triangle';
                 osc.frequency.setValueAtTime(180, this.ctx.currentTime);
@@ -307,7 +733,7 @@ game_html = """
                 osc.start(); osc.stop(this.ctx.currentTime + 0.2);
             }
             crashBoomCinematic() {
-                if (!this.ctx) return;
+                if (!soundEnabled || !this.ctx) return;
                 const now = this.ctx.currentTime;
                 
                 const osc1 = this.ctx.createOscillator();
@@ -315,7 +741,6 @@ game_html = """
                 osc1.type = 'sine';
                 osc1.frequency.setValueAtTime(180, now);
                 osc1.frequency.exponentialRampToValueAtTime(20, now + 1.0);
-                
                 gain1.gain.setValueAtTime(1.2, now);
                 gain1.gain.exponentialRampToValueAtTime(0.001, now + 1.0);
                 
@@ -324,7 +749,6 @@ game_html = """
                 osc2.type = 'sawtooth';
                 osc2.frequency.setValueAtTime(95, now);
                 osc2.frequency.exponentialRampToValueAtTime(12, now + 0.6);
-                
                 gain2.gain.setValueAtTime(0.8, now);
                 gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
 
@@ -475,10 +899,9 @@ game_html = """
             const treeR = createSceneryPineTree(); treeR.position.set(11 + Math.random()*9, 0, z + 5); scene.add(treeR); sideDecorations.push(treeR);
         }
 
-        // --- 6. SANTA & BẦY 10 CON TUẦN LỘC (GẦN NHAU HƠN) ---
+        // --- 6. SANTA & BẦY 10 CON TUẦN LỘC ---
         const santaGroup = new THREE.Group();
 
-        // Xe Trượt
         const sleighMesh = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.55, 2.1), santaRedMat);
         sleighMesh.position.set(0, 0.45, 1.8); sleighMesh.castShadow = true; santaGroup.add(sleighMesh);
 
@@ -487,7 +910,6 @@ game_html = """
         const runnerR = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.15, 2.5), luxuryGoldRibbonMat);
         runnerR.position.set(0.6, 0.15, 1.8); santaGroup.add(runnerR);
 
-        // Nhóm Ông Già Noel
         const santaCharacter = new THREE.Group();
         santaCharacter.position.set(0, 0, 0);
 
@@ -508,7 +930,6 @@ game_html = """
 
         santaGroup.add(santaCharacter);
 
-        // Bầy 10 con tuần lộc ĐƯỢC XẾP GẦN NHAU HƠN KHI CHẠY
         const reindeers = [];
         const reindeerSquad = new THREE.Group();
 
@@ -531,7 +952,6 @@ game_html = """
             const antlerR = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.45, 0.08), antlerMat);
             antlerR.position.set(x + 0.2, 1.75, z - 0.6); antlerR.rotation.z = 0.3; deer.add(antlerR);
 
-            // Vector văng linh hoạt cho từng con
             const angle = Math.random() * Math.PI * 2;
             const speedVel = 0.15 + Math.random() * 0.15;
             deer.userData = { 
@@ -543,7 +963,6 @@ game_html = """
             return deer;
         }
 
-        // Tinh chỉnh khoảng cách Z cách nhau chỉ 0.95m và X rộng 0.48m (Thu nhỏ đội hình rất đẹp)
         reindeerSquad.add(createPhotorealisticReindeer(-0.48, 0.4));
         reindeerSquad.add(createPhotorealisticReindeer(0.48, 0.4));
         reindeerSquad.add(createPhotorealisticReindeer(-0.48, -0.55));
@@ -571,7 +990,7 @@ game_html = """
         // --- 7. ĐIỀU KHIỂN & LÀN ĐƯỜNG ---
         let gameRunning = false;
         let isGameOverAnim = false;
-        let score = 0, distance = 0, speed = 0.38;
+        let score = 0, distance = 0, speed = 0.38, accelerationRate = 0.00008;
         
         const lanes = [-5.0, 0, 5.0];
         let currentLane = 1;
@@ -726,14 +1145,12 @@ game_html = """
             crashedGifts = [];
 
             if (obstacleType === 'rock') {
-                // 1. VẤP CỤC ĐÁ: Xe trượt ngã nghiêng, Ông già Noel văng ra phía trước NẰM SẤP RÕ RÀNG
                 sleighMesh.rotation.z = -Math.PI / 2.2;
                 sleighMesh.position.y = 0.2;
 
-                santaCharacter.position.set(0, 0.35, -2.4); // Văng ra phía trước xe, sát tầm mắt camera
-                santaCharacter.rotation.set(Math.PI / 2, 0, 0); // Xoay nằm sấp hoàn toàn trên mặt băng
+                santaCharacter.position.set(0, 0.35, -2.4);
+                santaCharacter.rotation.set(Math.PI / 2, 0, 0);
             } else {
-                // 2. VẤP CÂY THÔNG / NGƯỜI TUYẾT: Xe dính mắc kẹt trên cao, Ông già Noel văng xuống đất
                 sleighMesh.position.y = 2.4;
                 sleighMesh.rotation.x = Math.PI / 35;
                 sleighMesh.rotation.z = -Math.PI / 6;
@@ -742,7 +1159,6 @@ game_html = """
                 santaCharacter.rotation.set(Math.PI / 2.2, 0.4, 0);
             }
 
-            // Hộp quà văng tung tóe khắp nơi xung quanh
             for (let i = 0; i < 20; i++) {
                 const miniGift = new THREE.Mesh(
                     new THREE.BoxGeometry(0.55, 0.55, 0.55),
@@ -758,7 +1174,6 @@ game_html = """
                 crashedGifts.push(miniGift);
             }
 
-            // ĐỢI ĐỦ 5 GIÂY MỚI HIỆN MÀN HÌNH BẢNG ĐIỂM
             setTimeout(() => {
                 document.getElementById('final-score').innerText = score;
                 document.getElementById('gameover-screen').style.display = 'flex';
@@ -771,18 +1186,27 @@ game_html = """
             document.getElementById('start-screen').style.display = 'none';
             document.getElementById('gameover-screen').style.display = 'none';
             
-            score = 0; distance = 0; speed = 0.38; currentLane = 1;
+            score = 0; distance = 0; currentLane = 1;
             activeCrashType = null;
 
-            // Reset xe trượt
+            // Thiết lập tốc độ theo mức độ khó đã chọn
+            if (selectedDifficulty === 'easy') {
+                speed = 0.34;
+                accelerationRate = 0.00006;
+            } else if (selectedDifficulty === 'medium') {
+                speed = 0.44;
+                accelerationRate = 0.00012;
+            } else if (selectedDifficulty === 'hard') {
+                speed = 0.55;
+                accelerationRate = 0.00022;
+            }
+
             sleighMesh.rotation.set(0, 0, 0);
             sleighMesh.position.set(0, 0.45, 1.8);
 
-            // Reset Ông Già Noel về lại xe
             santaCharacter.position.set(0, 0, 0);
             santaCharacter.rotation.set(0, 0, 0);
 
-            // Reset vị trí & góc quay 10 con tuần lộc
             reindeers.forEach(d => {
                 d.position.set(d.userData.origX, 0, d.userData.origZ);
                 d.rotation.set(0, 0, 0);
@@ -799,7 +1223,10 @@ game_html = """
             gameRunning = true;
         }
 
-        function restartGame() { startGame(); }
+        function restartGame() {
+            document.getElementById('gameover-screen').style.display = 'none';
+            document.getElementById('start-screen').style.display = 'flex';
+        }
 
         setInterval(spawnEntities, 1000);
 
@@ -816,7 +1243,8 @@ game_html = """
             snowGeo.attributes.position.needsUpdate = true;
 
             if (gameRunning) {
-                distance += 0.85; speed += 0.00008;
+                distance += 0.85; 
+                speed += accelerationRate; // Tăng tốc theo cấu hình mức độ
                 document.getElementById('distance').innerText = Math.floor(distance / 10);
                 document.getElementById('score').innerText = score;
 
@@ -876,7 +1304,6 @@ game_html = """
                     }
                 }
             } else if (isGameOverAnim) {
-                // Hiệu ứng 10 con tuần lộc bay văng ra xung quanh khi thua (cho cả 2 trường hợp)
                 reindeers.forEach(d => {
                     d.position.x += d.userData.vx * 1.6;
                     d.position.z += d.userData.vz * 1.6;
