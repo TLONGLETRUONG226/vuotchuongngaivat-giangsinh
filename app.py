@@ -3,7 +3,7 @@ import streamlit.components.v1 as components
 
 # Cấu hình Streamlit tràn màn hình
 st.set_page_config(
-    page_title="Ông Già Noel Vượt Chướng Ngại Vật 3D",
+    page_title="Ông Già Noel Vượt Chướng NGại Vật 3D",
     page_icon="🎅",
     layout="wide",
     initial_sidebar_state="collapsed"
@@ -230,7 +230,7 @@ game_html = """
     <div id="start-screen">
         <h1>🎅 ÔNG GIÀ NOEL VƯỢT CHƯỚNG NGẠI VẬT</h1>
         <div class="subtitle">hãy giúp ông vượt chướng ngại vật để ông phát quà nhé</div>
-        <p>Bầy 8 con tuần lộc dũng mãnh kéo xe trượt! Các vật cản như cây thông và người tuyết không thể nhảy qua - hãy chuyển làn nhanh tay để tránh nhé!<br><br><b>Cách chơi:</b> Dùng phím <b>Mũi tên Trái / Phải / A / D</b> hoặc nút cảm ứng để đổi làn, phím <b>Cách (Space) / Lên</b> để nhảy.</p>
+        <p>Đội 10 con tuần lộc dũng mãnh kéo xe trượt! Cây thông và người tuyết rất cao - bắt buộc phải đổi làn để né. Riêng cục đá thấp hơn có thể dùng phím Nhảy để bay qua!<br><br><b>Cách chơi:</b> Dùng phím <b>Mũi tên Trái / Phải / A / D</b> hoặc nút cảm ứng để đổi làn, phím <b>Cách (Space) / Lên</b> để nhảy.</p>
         <button class="btn" onclick="startGame()">BẮT ĐẦU CHƠI 🚀</button>
     </div>
 
@@ -453,18 +453,18 @@ game_html = """
             return tree;
         }
 
-        // CÂY THÔNG CHƯỚNG NGẠI VẬT (GỌN DỄ NHÌN ĐƯỜNG CHẠY NHƯNG TUYỆT ĐỐI KHÔNG THỂ NHẢY QUA)
+        // CÂY THÔNG CHƯỚNG NGẠI VẬT (CAO VỪA VĂN - KHÔNG THỂ NHẢY QUA)
         function createObstaclePineTree() {
             const tree = new THREE.Group();
-            const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.42, 1.4), woodTrunkMat);
-            trunk.position.y = 0.7; trunk.castShadow = true; tree.add(trunk);
+            const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.32, 0.48, 1.8), woodTrunkMat);
+            trunk.position.y = 0.9; trunk.castShadow = true; tree.add(trunk);
             
             for(let i = 0; i < 3; i++) {
-                const cone = new THREE.Mesh(new THREE.ConeGeometry(1.65 - i*0.3, 1.6, 12), pineLeafMat);
-                cone.position.y = 1.3 + i * 0.75; cone.castShadow = true; tree.add(cone);
+                const cone = new THREE.Mesh(new THREE.ConeGeometry(1.8 - i*0.32, 1.9, 12), pineLeafMat);
+                cone.position.y = 1.6 + i * 0.85; cone.castShadow = true; tree.add(cone);
                 
-                const snowCap = new THREE.Mesh(new THREE.ConeGeometry(1.4 - i*0.25, 0.45, 12), snowCapMat);
-                snowCap.position.y = 2.0 + i * 0.75; tree.add(snowCap);
+                const snowCap = new THREE.Mesh(new THREE.ConeGeometry(1.55 - i*0.25, 0.5, 12), snowCapMat);
+                snowCap.position.y = 2.45 + i * 0.85; tree.add(snowCap);
             }
             return tree;
         }
@@ -475,7 +475,7 @@ game_html = """
             const treeR = createSceneryPineTree(); treeR.position.set(11 + Math.random()*9, 0, z + 5); scene.add(treeR); sideDecorations.push(treeR);
         }
 
-        // --- 6. SANTA & BẦY 8 CON TUẦN LỘC (4 HÀNG ĐÔI) ---
+        // --- 6. SANTA & BẦY 10 CON TUẦN LỘC (5 HÀNG ĐÔI) ---
         const santaGroup = new THREE.Group();
 
         const sleigh = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.55, 2.1), santaRedMat);
@@ -523,15 +523,17 @@ game_html = """
             return deer;
         }
 
-        // BẦY 8 CON TUẦN LỘC DẪN ĐƯỜNG (4 HÀNG ĐÔI)
+        // BẦY 10 CON TUẦN LỘC DẪN ĐƯỜNG (5 HÀNG ĐÔI)
         santaGroup.add(createPhotorealisticReindeer(-0.55, 0.3));
         santaGroup.add(createPhotorealisticReindeer(0.55, 0.3));
         santaGroup.add(createPhotorealisticReindeer(-0.55, -1.0));
         santaGroup.add(createPhotorealisticReindeer(0.55, -1.0));
         santaGroup.add(createPhotorealisticReindeer(-0.55, -2.3));
         santaGroup.add(createPhotorealisticReindeer(0.55, -2.3));
-        santaGroup.add(createPhotorealisticReindeer(-0.55, -3.6, true));
-        santaGroup.add(createPhotorealisticReindeer(0.55, -3.6, true));
+        santaGroup.add(createPhotorealisticReindeer(-0.55, -3.6));
+        santaGroup.add(createPhotorealisticReindeer(0.55, -3.6));
+        santaGroup.add(createPhotorealisticReindeer(-0.55, -4.9, true));
+        santaGroup.add(createPhotorealisticReindeer(0.55, -4.9, true));
 
         const headlight = new THREE.SpotLight(0xfffae0, 2.8, 40, Math.PI / 5, 0.4);
         headlight.position.set(0, 1, -1.0);
@@ -614,45 +616,52 @@ game_html = """
                 const type = Math.random();
 
                 if (type < 0.35) {
+                    // Cây thông (Không thể nhảy qua)
                     const obstacleTree = createObstaclePineTree();
                     obsGroup.add(obstacleTree);
+                    obsGroup.userData = { type: 'high' }; // Đánh dấu chướng ngại vật cao
                 } else if (type < 0.75) {
-                    const bodyLower = new THREE.Mesh(new THREE.SphereGeometry(1.15, 24, 24), snowmanBodyMat);
-                    bodyLower.position.y = 1.15; bodyLower.castShadow = true; obsGroup.add(bodyLower);
+                    // Người tuyết nâng cao lên 1 tí (Không thể nhảy qua)
+                    const bodyLower = new THREE.Mesh(new THREE.SphereGeometry(1.25, 24, 24), snowmanBodyMat);
+                    bodyLower.position.y = 1.25; bodyLower.castShadow = true; obsGroup.add(bodyLower);
 
-                    const bodyUpper = new THREE.Mesh(new THREE.SphereGeometry(0.82, 24, 24), snowmanBodyMat);
-                    bodyUpper.position.y = 2.45; bodyUpper.castShadow = true; obsGroup.add(bodyUpper);
+                    const bodyUpper = new THREE.Mesh(new THREE.SphereGeometry(0.9, 24, 24), snowmanBodyMat);
+                    bodyUpper.position.y = 2.65; bodyUpper.castShadow = true; obsGroup.add(bodyUpper);
 
-                    const head = new THREE.Mesh(new THREE.SphereGeometry(0.58, 24, 24), snowmanBodyMat);
-                    head.position.y = 3.35; head.castShadow = true; obsGroup.add(head);
+                    const head = new THREE.Mesh(new THREE.SphereGeometry(0.62, 24, 24), snowmanBodyMat);
+                    head.position.y = 3.6; head.castShadow = true; obsGroup.add(head);
 
-                    const scarf = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.62, 0.28, 24), scarfMat);
-                    scarf.position.y = 3.0; scarf.castShadow = true; obsGroup.add(scarf);
-                    const scarfTail = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.65, 0.1), scarfMat);
-                    scarfTail.position.set(0.32, 2.7, 0.42); obsGroup.add(scarfTail);
+                    const scarf = new THREE.Mesh(new THREE.CylinderGeometry(0.65, 0.68, 0.3, 24), scarfMat);
+                    scarf.position.y = 3.2; scarf.castShadow = true; obsGroup.add(scarf);
+                    const scarfTail = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.7, 0.1), scarfMat);
+                    scarfTail.position.set(0.35, 2.9, 0.45); obsGroup.add(scarfTail);
 
                     const eyeL = new THREE.Mesh(new THREE.SphereGeometry(0.06, 12, 12), coalMat);
-                    eyeL.position.set(-0.18, 3.48, 0.5); obsGroup.add(eyeL);
+                    eyeL.position.set(-0.18, 3.75, 0.52); obsGroup.add(eyeL);
                     const eyeR = new THREE.Mesh(new THREE.SphereGeometry(0.06, 12, 12), coalMat);
-                    eyeR.position.set(0.18, 3.48, 0.5); obsGroup.add(eyeR);
+                    eyeR.position.set(0.18, 3.75, 0.52); obsGroup.add(eyeR);
 
-                    const nose = new THREE.Mesh(new THREE.ConeGeometry(0.08, 0.42, 16), carrotMat);
+                    const nose = new THREE.Mesh(new THREE.ConeGeometry(0.08, 0.45, 16), carrotMat);
                     nose.rotation.x = Math.PI / 2;
-                    nose.position.set(0, 3.35, 0.68); obsGroup.add(nose);
+                    nose.position.set(0, 3.6, 0.72); obsGroup.add(nose);
 
                     for(let m = -1; m <= 1; m++) {
                         const mouthDot = new THREE.Mesh(new THREE.SphereGeometry(0.03, 8, 8), coalMat);
-                        mouthDot.position.set(m * 0.1, 3.16, 0.54); obsGroup.add(mouthDot);
+                        mouthDot.position.set(m * 0.1, 3.38, 0.58); obsGroup.add(mouthDot);
                     }
 
-                    const hatBrim = new THREE.Mesh(new THREE.CylinderGeometry(0.48, 0.48, 0.08, 24), topHatMat);
-                    hatBrim.position.y = 3.72; obsGroup.add(hatBrim);
-                    const hatTop = new THREE.Mesh(new THREE.CylinderGeometry(0.32, 0.32, 0.42, 24), topHatMat);
-                    hatTop.position.y = 3.96; obsGroup.add(hatTop);
+                    const hatBrim = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 0.08, 24), topHatMat);
+                    hatBrim.position.y = 4.0; obsGroup.add(hatBrim);
+                    const hatTop = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.35, 0.45, 24), topHatMat);
+                    hatTop.position.y = 4.25; obsGroup.add(hatTop);
+
+                    obsGroup.userData = { type: 'high' }; // Đánh dấu chướng ngại vật cao
 
                 } else {
-                    const rock = new THREE.Mesh(new THREE.DodecahedronGeometry(1.35), new THREE.MeshStandardMaterial({ color: 0x64748b, roughness: 0.8 }));
-                    rock.position.y = 1.0; rock.castShadow = true; obsGroup.add(rock);
+                    // Cục đá (Có thể nhảy qua)
+                    const rock = new THREE.Mesh(new THREE.DodecahedronGeometry(1.2), new THREE.MeshStandardMaterial({ color: 0x64748b, roughness: 0.8 }));
+                    rock.position.y = 0.9; rock.castShadow = true; obsGroup.add(rock);
+                    obsGroup.userData = { type: 'jumpable' }; // Đánh dấu có thể nhảy qua
                 }
 
                 obsGroup.position.set(xPos, 0, zPos);
@@ -740,13 +749,20 @@ game_html = """
                     let dx = santaGroup.position.x - obstacles[i].position.x;
                     let dz = santaGroup.position.z - obstacles[i].position.z;
 
-                    // KIỂM TRA VA CHẠM: Giới hạn độ cao y < 3.2m đảm bảo nhảy không qua được vật cản
-                    if (Math.abs(dx) < 1.3 && Math.abs(dz) < 1.4 && santaGroup.position.y < 3.2) {
-                        gameRunning = false;
-                        audio.stopBGM();
-                        audio.crashBoomCinematic();
-                        document.getElementById('final-score').innerText = score;
-                        document.getElementById('gameover-screen').style.display = 'flex';
+                    if (Math.abs(dx) < 1.3 && Math.abs(dz) < 1.4) {
+                        let isHighObstacle = obstacles[i].userData && obstacles[i].userData.type === 'high';
+                        
+                        // Nếu là Cây thông hoặc Người tuyết (high): Bắt buộc y < 3.5 mới va chạm (không thể nhảy qua)
+                        // Nếu là Cục đá (jumpable): Chỉ va chạm khi y < 1.2 (có thể nhảy qua)
+                        let collisionThreshold = isHighObstacle ? 3.5 : 1.2;
+
+                        if (santaGroup.position.y < collisionThreshold) {
+                            gameRunning = false;
+                            audio.stopBGM();
+                            audio.crashBoomCinematic();
+                            document.getElementById('final-score').innerText = score;
+                            document.getElementById('gameover-screen').style.display = 'flex';
+                        }
                     }
 
                     if (obstacles[i].position.z > 15) {
