@@ -3,7 +3,7 @@ import streamlit.components.v1 as components
 
 # Cấu hình Streamlit tràn màn hình
 st.set_page_config(
-    page_title="Ông Già Noel Vượt Chướng Ngại Vật Phát Quà",
+    page_title="Ông Già Noel Vượt Chướng Ngại Vật 3D",
     page_icon="🎅",
     layout="wide",
     initial_sidebar_state="collapsed"
@@ -544,7 +544,7 @@ game_html = """
             const treeR = createSceneryPineTree(); treeR.position.set(11 + Math.random()*9, 0, z + 5); scene.add(treeR); sideDecorations.push(treeR);
         }
 
-        // --- 6. SANTA & BẦY 10 TUẦN LỘC (ĐỨNG SÁT KHÍT NHAU & CHẠY 4 CHÂN) ---
+        // --- 6. SANTA & BẦY 10 TUẦN LỘC ---
         const santaGroup = new THREE.Group();
 
         const sleighMesh = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.6, 2.4), santaRedMat);
@@ -590,7 +590,6 @@ game_html = """
             const antlerR = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.4, 0.06), antlerMat);
             antlerR.position.set(x + 0.16, 1.6, z - 0.5); antlerR.rotation.z = 0.35; deer.add(antlerR);
 
-            // 4 CHÂN CHÂN THẬT
             const legGeo = new THREE.CylinderGeometry(0.05, 0.04, 0.6);
             const legFL = new THREE.Mesh(legGeo, deerMat); legFL.position.set(x - 0.2, 0.3, z - 0.35); deer.add(legFL);
             const legFR = new THREE.Mesh(legGeo, deerMat); legFR.position.set(x + 0.2, 0.3, z - 0.35); deer.add(legFR);
@@ -610,19 +609,14 @@ game_html = """
             return deer;
         }
 
-        // ĐỘI HÌNH 10 TUẦN LỘC XÍC LẠI THẬT GẦN NHAU (Khoảng cách X = 0.32, Z = 0.6)
         reindeerSquad.add(createPhotorealisticReindeer(-0.32, 0.4));
         reindeerSquad.add(createPhotorealisticReindeer(0.32, 0.4));
-
         reindeerSquad.add(createPhotorealisticReindeer(-0.32, -0.2));
         reindeerSquad.add(createPhotorealisticReindeer(0.32, -0.2));
-
         reindeerSquad.add(createPhotorealisticReindeer(-0.32, -0.8));
         reindeerSquad.add(createPhotorealisticReindeer(0.32, -0.8));
-
         reindeerSquad.add(createPhotorealisticReindeer(-0.32, -1.4));
         reindeerSquad.add(createPhotorealisticReindeer(0.32, -1.4));
-
         reindeerSquad.add(createPhotorealisticReindeer(-0.32, -2.0, true));
         reindeerSquad.add(createPhotorealisticReindeer(0.32, -2.0, true));
 
@@ -699,10 +693,8 @@ game_html = """
             if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') canMoveRight = true;
         });
 
-        // HỘP QUÀ 3D TỰ NHIÊN CHÂN THẬT
         function createGift3D() {
             const giftGroup = new THREE.Group();
-            
             const box = new THREE.Mesh(new THREE.BoxGeometry(1.2, 1.2, 1.2), luxuryGiftMat);
             box.position.y = 0.6; box.castShadow = true; giftGroup.add(box);
 
@@ -796,11 +788,13 @@ game_html = """
             crashedGifts = [];
 
             if (obstacleType === 'rock') {
-                sleighMesh.rotation.z = -Math.PI / 2.2;
-                sleighMesh.position.y = 0.2;
-                santaCharacter.position.set(0, 0.35, -2.4);
-                santaCharacter.rotation.set(Math.PI / 2, 0, 0);
+                // Hiệu ứng khi đụng cục đá: Xe lật nhẹ nghiêng trên mặt đường, ông già Noel ngả người lên trên rõ ràng
+                sleighMesh.rotation.set(0.3, 0, -Math.PI / 2.5);
+                sleighMesh.position.set(0, 0.6, 1.8);
+                santaCharacter.position.set(0, 0.8, 1.2);
+                santaCharacter.rotation.set(Math.PI / 3, 0, 0.2);
             } else {
+                // Hiệu ứng khi đụng cây/người tuyết
                 sleighMesh.position.y = 2.4;
                 sleighMesh.rotation.x = Math.PI / 35;
                 sleighMesh.rotation.z = -Math.PI / 6;
@@ -898,7 +892,6 @@ game_html = """
                 santaGroup.position.x += (targetX - santaGroup.position.x) * 0.2;
                 santaGroup.rotation.z = (santaGroup.position.x - targetX) * 0.03;
 
-                // CHUYỂN ĐỘNG NƯỚC ĐẠI 4 CHÂN TUẦN LỘC
                 reindeers.forEach((d) => {
                     const legCycle = Math.sin(time * 2.5 + d.userData.offset) * 0.35;
                     d.userData.legs[0].rotation.x = legCycle;
