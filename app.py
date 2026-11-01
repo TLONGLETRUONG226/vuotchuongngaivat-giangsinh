@@ -237,7 +237,7 @@ game_html = """
     <!-- Màn Hình Thua -->
     <div id="gameover-screen" style="display: none;">
         <h1>💥 VA CHẠM CỰC MẠNH!</h1>
-        <p>Xe trượt đã lật nghiêng, ông già Noel ngã sấp và quà tràn ra khắp nơi!<br><br>🎁 Tổng số quà thu thập: <b><span id="final-score">0</span></b></p>
+        <p>Đã xảy ra va chạm trên đường băng tuyết!<br><br>🎁 Tổng số quà thu thập: <b><span id="final-score">0</span></b></p>
         <button class="btn" onclick="restartGame()">CHƠI LẠI 🔄</button>
     </div>
 
@@ -475,7 +475,7 @@ game_html = """
             const treeR = createSceneryPineTree(); treeR.position.set(11 + Math.random()*9, 0, z + 5); scene.add(treeR); sideDecorations.push(treeR);
         }
 
-        // --- 6. SANTA & BẦY 10 CON TUẦN LỘC (TÁCH THÀNH CÁC PHẦN ĐỂ TẠO HIỆU ỨNG THUA) ---
+        // --- 6. SANTA & BẦY 10 CON TUẦN LỘC (TÁCH THÀNH ĐỐI TƯỢNG ĐỘNG) ---
         const santaGroup = new THREE.Group();
 
         // Xe Trượt
@@ -487,7 +487,7 @@ game_html = """
         const runnerR = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.15, 2.5), luxuryGoldRibbonMat);
         runnerR.position.set(0.6, 0.15, 1.8); santaGroup.add(runnerR);
 
-        // Nhóm Ông Già Noel (Thân, Đầu, Mũ, Bao Tải)
+        // Nhóm Ông Già Noel
         const santaCharacter = new THREE.Group();
         santaCharacter.position.set(0, 0, 0);
 
@@ -508,8 +508,10 @@ game_html = """
 
         santaGroup.add(santaCharacter);
 
-        // Đội 10 Tuần Lộc
+        // Bầy 10 con tuần lộc (Lưu giữ tham chiếu riêng để tạo hiệu ứng chạy toán loạn)
+        const reindeers = [];
         const reindeerSquad = new THREE.Group();
+
         function createPhotorealisticReindeer(x, z, isRudolph = false) {
             const deer = new THREE.Group();
             const body = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.6, 1.3), deerMat);
@@ -529,6 +531,8 @@ game_html = """
             const antlerR = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.45, 0.08), antlerMat);
             antlerR.position.set(x + 0.2, 1.75, z - 0.6); antlerR.rotation.z = 0.3; deer.add(antlerR);
 
+            deer.userData = { origX: x, origZ: z, vx: (Math.random() - 0.5) * 0.15, vz: (Math.random() - 0.5) * 0.15 };
+            reindeers.push(deer);
             return deer;
         }
 
@@ -553,8 +557,8 @@ game_html = """
 
         scene.add(santaGroup);
 
-        // Nơi chứa các hộp quà bị văng ra khi thua
         let crashedGifts = [];
+        let activeCrashType = null; // 'rock' hoặc 'high' (cây thông / người tuyết)
 
         // --- 7. ĐIỀU KHIỂN & LÀN ĐƯỜNG ---
         let gameRunning = false;
@@ -617,7 +621,7 @@ game_html = """
             if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') canMoveRight = true;
         });
 
-        // --- 8. TẠO VẬT CẢN & HỘP QUÀ SIÊU THỰC ---
+        // --- 8. TẠO VẬT CẢN & HỘP QUÀ ---
         function spawnEntities() {
             if (!gameRunning || isGameOverAnim) return;
             const laneIdx = Math.floor(Math.random() * lanes.length);
@@ -702,48 +706,55 @@ game_html = """
             }
         }
 
-        // --- KÍCH HOẠT HIỆU ỨNG THUA (XE LẬT, ÔNG GIÀ NOEL NẰM SẤP, QUÀ VĂNG) ---
-        function triggerGameOverEffect() {
+        // --- KÍCH HOẠT HIỆU ỨNG THUA THEO TỪNG LOẠI VẬT CẢN ---
+        function triggerGameOverEffect(obstacleType) {
             gameRunning = false;
             isGameOverAnim = true;
+            activeCrashType = obstacleType;
             audio.stopBGM();
             audio.crashBoomCinematic();
 
-            // 1. Xe trượt nghiêng ngã văng sang một bên
-            sleighMesh.rotation.z = -Math.PI / 3;
-            sleighMesh.rotation.x = 0.2;
-            sleighMesh.position.y = 0.2;
-
-            // 2. Ông già Noel bị hất văng về phía trước & NẰM SẤP
-            santaCharacter.position.set(0, -0.4, -1.8);
-            santaCharacter.rotation.x = Math.PI / 2; // Xoay nằm sấp mặt xuống băng
-            santaCharacter.rotation.y = 0.3;
-
-            // 3. Hộp quà từ bao tải văng tràn tung tóe khắp mặt sàn
             crashedGifts.forEach(g => scene.remove(g));
             crashedGifts = [];
 
-            for (let i = 0; i < 16; i++) {
+            if (obstacleType === 'rock') {
+                // 1. Vấp cục đá: Xe trượt ngã, ông già Noel nằm sấp, tuần lộc chạy toán loạn
+                sleighMesh.rotation.z = -Math.PI / 2.5;
+                sleighMesh.position.y = 0.2;
+
+                santaCharacter.position.set(0, -0.3, -1.8);
+                santaCharacter.rotation.x = Math.PI / 2; // Nằm sấp
+
+            } else {
+                // 2. Vấp Cây thông / Người tuyết: Xe bị treo trên vật cản, ông già Noel văng xuống đất
+                sleighMesh.position.y = 2.2;
+                sleighMesh.rotation.x = Math.PI / 4;
+
+                santaCharacter.position.set(0.5, 0.2, -1.5);
+                santaCharacter.rotation.set(0.2, 0.5, Math.PI / 2);
+            }
+
+            // Hộp quà văng tứ tung
+            for (let i = 0; i < 18; i++) {
                 const miniGift = new THREE.Mesh(
                     new THREE.BoxGeometry(0.5, 0.5, 0.5),
                     Math.random() > 0.4 ? luxuryGiftMat : luxuryGoldRibbonMat
                 );
-                // Văng ra vị trí ngẫu nhiên xung quanh xe trượt
                 miniGift.position.set(
-                    santaGroup.position.x + (Math.random() - 0.5) * 4.5,
+                    santaGroup.position.x + (Math.random() - 0.5) * 5.5,
                     0.25,
-                    santaGroup.position.z + (Math.random() - 0.5) * 4.5
+                    santaGroup.position.z + (Math.random() - 0.5) * 5.5
                 );
                 miniGift.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, 0);
                 scene.add(miniGift);
                 crashedGifts.push(miniGift);
             }
 
-            // Hiện bảng Game Over sau khi hiệu ứng diễn ra 800ms
+            // SAU 5 GIÂY MỚI HIỆN MÀN HÌNH THUA
             setTimeout(() => {
                 document.getElementById('final-score').innerText = score;
                 document.getElementById('gameover-screen').style.display = 'flex';
-            }, 800);
+            }, 5000);
         }
 
         function startGame() {
@@ -753,13 +764,18 @@ game_html = """
             document.getElementById('gameover-screen').style.display = 'none';
             
             score = 0; distance = 0; speed = 0.38; currentLane = 1;
-            
-            // Reset vị trí xe & Ông già Noel trở lại bình thường
+            activeCrashType = null;
+
+            // Reset vị trí xe & nhân vật
             sleighMesh.rotation.set(0, 0, 0);
             sleighMesh.position.set(0, 0.45, 1.8);
 
             santaCharacter.position.set(0, 0, 0);
             santaCharacter.rotation.set(0, 0, 0);
+
+            reindeers.forEach(d => {
+                d.position.set(0, 0, 0);
+            });
 
             santaGroup.position.set(lanes[1], 0, 0);
 
@@ -821,7 +837,7 @@ game_html = """
                         let collisionThreshold = isHighObstacle ? 3.5 : 1.2;
 
                         if (santaGroup.position.y < collisionThreshold) {
-                            triggerGameOverEffect(); // Kích hoạt hiệu ứng ngã sấp & lật xe
+                            triggerGameOverEffect(isHighObstacle ? 'high' : 'rock');
                         }
                     }
 
@@ -848,6 +864,13 @@ game_html = """
                         gifts.splice(i, 1);
                     }
                 }
+            } else if (isGameOverAnim && activeCrashType === 'rock') {
+                // Hiệu ứng tuần lộc chạy toán loạn khi vấp cục đá
+                reindeers.forEach(d => {
+                    d.position.x += d.userData.vx * 1.5;
+                    d.position.z += d.userData.vz * 1.5;
+                    d.rotation.y += 0.08;
+                });
             }
 
             renderer.render(scene, camera);
