@@ -475,7 +475,7 @@ game_html = """
             const treeR = createSceneryPineTree(); treeR.position.set(11 + Math.random()*9, 0, z + 5); scene.add(treeR); sideDecorations.push(treeR);
         }
 
-        // --- 6. SANTA & BẦY 10 CON TUẦN LỘC (TÁCH THÀNH ĐỐI TƯỢNG ĐỘNG) ---
+        // --- 6. SANTA & BẦY 10 CON TUẦN LỘC ---
         const santaGroup = new THREE.Group();
 
         // Xe Trượt
@@ -508,7 +508,7 @@ game_html = """
 
         santaGroup.add(santaCharacter);
 
-        // Bầy 10 con tuần lộc (Lưu giữ tham chiếu riêng để tạo hiệu ứng chạy toán loạn)
+        // Bầy 10 con tuần lộc
         const reindeers = [];
         const reindeerSquad = new THREE.Group();
 
@@ -531,7 +531,12 @@ game_html = """
             const antlerR = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.45, 0.08), antlerMat);
             antlerR.position.set(x + 0.2, 1.75, z - 0.6); antlerR.rotation.z = 0.3; deer.add(antlerR);
 
-            deer.userData = { origX: x, origZ: z, vx: (Math.random() - 0.5) * 0.15, vz: (Math.random() - 0.5) * 0.15 };
+            // Lưu tọa độ gốc để reset khi chơi lại
+            deer.userData = { 
+                origX: x, origZ: z, 
+                vx: (Math.random() - 0.5) * 0.15, 
+                vz: (Math.random() - 0.5) * 0.15 
+            };
             reindeers.push(deer);
             return deer;
         }
@@ -558,7 +563,7 @@ game_html = """
         scene.add(santaGroup);
 
         let crashedGifts = [];
-        let activeCrashType = null; // 'rock' hoặc 'high' (cây thông / người tuyết)
+        let activeCrashType = null;
 
         // --- 7. ĐIỀU KHIỂN & LÀN ĐƯỜNG ---
         let gameRunning = false;
@@ -706,7 +711,7 @@ game_html = """
             }
         }
 
-        // --- KÍCH HOẠT HIỆU ỨNG THUA THEO TỪNG LOẠI VẬT CẢN ---
+        // --- KÍCH HOẠT HIỆU ỨNG THUA ---
         function triggerGameOverEffect(obstacleType) {
             gameRunning = false;
             isGameOverAnim = true;
@@ -718,15 +723,12 @@ game_html = """
             crashedGifts = [];
 
             if (obstacleType === 'rock') {
-                // 1. Vấp cục đá: Xe trượt ngã, ông già Noel nằm sấp, tuần lộc chạy toán loạn
                 sleighMesh.rotation.z = -Math.PI / 2.5;
                 sleighMesh.position.y = 0.2;
 
                 santaCharacter.position.set(0, -0.3, -1.8);
                 santaCharacter.rotation.x = Math.PI / 2; // Nằm sấp
-
             } else {
-                // 2. Vấp Cây thông / Người tuyết: Xe bị treo trên vật cản, ông già Noel văng xuống đất
                 sleighMesh.position.y = 2.2;
                 sleighMesh.rotation.x = Math.PI / 4;
 
@@ -734,7 +736,6 @@ game_html = """
                 santaCharacter.rotation.set(0.2, 0.5, Math.PI / 2);
             }
 
-            // Hộp quà văng tứ tung
             for (let i = 0; i < 18; i++) {
                 const miniGift = new THREE.Mesh(
                     new THREE.BoxGeometry(0.5, 0.5, 0.5),
@@ -750,7 +751,6 @@ game_html = """
                 crashedGifts.push(miniGift);
             }
 
-            // SAU 5 GIÂY MỚI HIỆN MÀN HÌNH THUA
             setTimeout(() => {
                 document.getElementById('final-score').innerText = score;
                 document.getElementById('gameover-screen').style.display = 'flex';
@@ -766,15 +766,18 @@ game_html = """
             score = 0; distance = 0; speed = 0.38; currentLane = 1;
             activeCrashType = null;
 
-            // Reset vị trí xe & nhân vật
+            // Reset vị trí xe trượt
             sleighMesh.rotation.set(0, 0, 0);
             sleighMesh.position.set(0, 0.45, 1.8);
 
+            // Reset ông già Noel về tư thế lái xe bình thường
             santaCharacter.position.set(0, 0, 0);
             santaCharacter.rotation.set(0, 0, 0);
 
+            // RESET TOÀN BỘ VỊ TRÍ & GÓC QUAY CỦA BẦY TUẦN LỌC VỀ BAN ĐẦU
             reindeers.forEach(d => {
-                d.position.set(0, 0, 0);
+                d.position.set(d.userData.origX, 0, d.userData.origZ);
+                d.rotation.set(0, 0, 0);
             });
 
             santaGroup.position.set(lanes[1], 0, 0);
