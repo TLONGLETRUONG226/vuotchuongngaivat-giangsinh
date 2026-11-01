@@ -3,7 +3,7 @@ import streamlit.components.v1 as components
 
 # Cấu hình Streamlit tràn màn hình
 st.set_page_config(
-    page_title="Santa's Cinematic Photorealistic Dash 3D",
+    page_title="Santa's Ultra Reindeer Squad 3D",
     page_icon="🦌",
     layout="wide",
     initial_sidebar_state="collapsed"
@@ -30,7 +30,7 @@ game_html = """
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Santa Photorealistic Cinematic Dash</title>
+    <title>Santa Ultra Reindeer Squad 3D</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@700;800;900&family=Comfortaa:wght@700&display=swap');
 
@@ -55,7 +55,7 @@ game_html = """
             display: block;
         }
         
-        /* HUD UI Kính Mờ Đẳng Cấp */
+        /* HUD UI Kính Mờ */
         #ui-layer {
             position: absolute;
             top: 0;
@@ -114,7 +114,7 @@ game_html = """
         h1 {
             font-family: 'Be Vietnam Pro', sans-serif;
             font-weight: 900;
-            font-size: 48px;
+            font-size: 46px;
             background: linear-gradient(135deg, #38bdf8 0%, #facc15 50%, #ef4444 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -221,8 +221,8 @@ game_html = """
 
     <!-- Màn Hình Khởi Đầu -->
     <div id="start-screen">
-        <h1>🎄 SANTA CINEMATIC DASH 3D</h1>
-        <p>Đồ họa siêu chân thực cao cấp! Cây chướng ngại vật đã được thu nhỏ gọn gàng giúp dễ dàng quan sát đường chạy.<br><br><b>Cách chơi:</b> Dùng phím <b>Mũi tên Trái / Phải / A / D</b> hoặc nút cảm ứng để đổi làn, phím <b>Cách (Space) / Lên</b> để nhảy.</p>
+        <h1>🦌 ĐỘI TUẦN LỘC SANTA ULTRA 3D</h1>
+        <p>Bầy 8 con tuần lộc dũng mãnh kéo xe trượt! Cây thông chướng ngại vật cao vừa tầm - không thể nhảy qua, hãy nhanh tay chuyển làn!<br><br><b>Cách chơi:</b> Dùng phím <b>Mũi tên Trái / Phải / A / D</b> hoặc nút cảm ứng để đổi làn, phím <b>Cách (Space) / Lên</b> để nhảy.</p>
         <button class="btn" onclick="startGame()">BẮT ĐẦU CHƠI 🚀</button>
     </div>
 
@@ -336,7 +336,7 @@ game_html = """
         scene.fog = new THREE.FogExp2(0x010409, 0.0065);
 
         const camera = new THREE.PerspectiveCamera(58, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(0, 6.5, 12);
+        camera.position.set(0, 6.8, 13);
         camera.lookAt(0, 1.2, -4);
 
         const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
@@ -348,7 +348,7 @@ game_html = """
         renderer.toneMappingExposure = 1.55;
         container.appendChild(renderer.domElement);
 
-        // --- 3. ÁNH SÁNG CHIỀU SÂU CINEMATIC ---
+        // --- 3. ÁNH SÁNG PHOTOREALISTIC ---
         const ambientLight = new THREE.AmbientLight(0x38bdf8, 0.65);
         scene.add(ambientLight);
 
@@ -395,11 +395,9 @@ game_html = """
         const pineLeafMat = new THREE.MeshStandardMaterial({ color: 0x064e3b, roughness: 0.45 });
         const snowCapMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.3 });
 
-        // Hộp quà siêu cấp
         const luxuryGiftMat = new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.12, metalness: 0.35, emissive: 0x450a0a, emissiveIntensity: 0.3 });
         const luxuryGoldRibbonMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.08, metalness: 0.98 });
 
-        // Người tuyết siêu thực
         const snowmanBodyMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.4 });
         const scarfMat = new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.25 });
         const coalMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.1 });
@@ -431,7 +429,7 @@ game_html = """
         const bankRight = new THREE.Mesh(new THREE.BoxGeometry(32, 2.2, 300), snowGroundMat);
         bankRight.position.set(24, 0, -100); bankRight.receiveShadow = true; scene.add(bankRight);
 
-        // --- HÀM TẠO CÂY THÔNG 2 BÊN ĐƯỜNG (CỠ LỚN) ---
+        // CÂY THÔNG 2 BÊN ĐƯỜNG
         function createSceneryPineTree() {
             const tree = new THREE.Group();
             const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.55, 2.8), woodTrunkMat);
@@ -447,18 +445,18 @@ game_html = """
             return tree;
         }
 
-        // --- HÀM TẠO CÂY THÔNG CHƯỚNG NGẠI VẬT (ĐÃ LÙN XUỐNG ĐỂ KHÔNG CHE TẦM NHÌN) ---
+        // CÂY THÔNG CHƯỚNG NGẠI VẬT (CAO VỪA VẶN - KHÔNG THỂ NHẢY QUA NHƯNG DỄ QUAN SÁT)
         function createObstaclePineTree() {
             const tree = new THREE.Group();
-            const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.4, 1.2), woodTrunkMat);
-            trunk.position.y = 0.6; trunk.castShadow = true; tree.add(trunk);
+            const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.48, 1.8), woodTrunkMat);
+            trunk.position.y = 0.9; trunk.castShadow = true; tree.add(trunk);
             
             for(let i = 0; i < 3; i++) {
-                const cone = new THREE.Mesh(new THREE.ConeGeometry(1.5 - i*0.3, 1.4, 12), pineLeafMat);
-                cone.position.y = 1.2 + i * 0.7; cone.castShadow = true; tree.add(cone);
+                const cone = new THREE.Mesh(new THREE.ConeGeometry(1.8 - i*0.35, 2.0, 12), pineLeafMat);
+                cone.position.y = 1.6 + i * 0.9; cone.castShadow = true; tree.add(cone);
                 
-                const snowCap = new THREE.Mesh(new THREE.ConeGeometry(1.3 - i*0.25, 0.4, 12), snowCapMat);
-                snowCap.position.y = 1.9 + i * 0.7; tree.add(snowCap);
+                const snowCap = new THREE.Mesh(new THREE.ConeGeometry(1.55 - i*0.3, 0.5, 12), snowCapMat);
+                snowCap.position.y = 2.4 + i * 0.9; tree.add(snowCap);
             }
             return tree;
         }
@@ -469,7 +467,7 @@ game_html = """
             const treeR = createSceneryPineTree(); treeR.position.set(11 + Math.random()*9, 0, z + 5); scene.add(treeR); sideDecorations.push(treeR);
         }
 
-        // --- 6. XE TRƯỢT & BẦY TUẦN LỘC ---
+        // --- 6. SANTA & BẦY 8 CON TUẦN LỘC (4 HÀNG ĐÔI) ---
         const santaGroup = new THREE.Group();
 
         const sleigh = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.55, 2.1), santaRedMat);
@@ -517,12 +515,15 @@ game_html = """
             return deer;
         }
 
-        santaGroup.add(createPhotorealisticReindeer(-0.55, 0.2));
-        santaGroup.add(createPhotorealisticReindeer(0.55, 0.2));
-        santaGroup.add(createPhotorealisticReindeer(-0.55, -1.2));
-        santaGroup.add(createPhotorealisticReindeer(0.55, -1.2));
-        santaGroup.add(createPhotorealisticReindeer(-0.55, -2.6, true));
-        santaGroup.add(createPhotorealisticReindeer(0.55, -2.6, true));
+        // BẦY 8 CON TUẦN LỘC DẪN ĐƯỜNG (4 HÀNG ĐÔI)
+        santaGroup.add(createPhotorealisticReindeer(-0.55, 0.3));
+        santaGroup.add(createPhotorealisticReindeer(0.55, 0.3));
+        santaGroup.add(createPhotorealisticReindeer(-0.55, -1.0));
+        santaGroup.add(createPhotorealisticReindeer(0.55, -1.0));
+        santaGroup.add(createPhotorealisticReindeer(-0.55, -2.3));
+        santaGroup.add(createPhotorealisticReindeer(0.55, -2.3));
+        santaGroup.add(createPhotorealisticReindeer(-0.55, -3.6, true));
+        santaGroup.add(createPhotorealisticReindeer(0.55, -3.6, true));
 
         const headlight = new THREE.SpotLight(0xfffae0, 2.8, 40, Math.PI / 5, 0.4);
         headlight.position.set(0, 1, -1.0);
@@ -605,11 +606,9 @@ game_html = """
                 const type = Math.random();
 
                 if (type < 0.35) {
-                    // Cây thông cản đường (phiên bản lùn gọn gàng, không che tầm nhìn)
                     const obstacleTree = createObstaclePineTree();
                     obsGroup.add(obstacleTree);
                 } else if (type < 0.75) {
-                    // --- NGƯỜI TUYẾT SỐNG ĐỘNG NHƯ THẬT ---
                     const bodyLower = new THREE.Mesh(new THREE.SphereGeometry(1.15, 24, 24), snowmanBodyMat);
                     bodyLower.position.y = 1.15; bodyLower.castShadow = true; obsGroup.add(bodyLower);
 
@@ -652,7 +651,6 @@ game_html = """
                 scene.add(obsGroup);
                 obstacles.push(obsGroup);
             } else {
-                // Hộp quà phát sáng cao cấp
                 const giftGroup = new THREE.Group();
                 const box = new THREE.Mesh(new THREE.BoxGeometry(1.25, 1.25, 1.25), luxuryGiftMat);
                 box.position.y = 0.62; box.castShadow = true; giftGroup.add(box);
@@ -734,7 +732,7 @@ game_html = """
                     let dx = santaGroup.position.x - obstacles[i].position.x;
                     let dz = santaGroup.position.z - obstacles[i].position.z;
 
-                    if (Math.abs(dx) < 1.3 && Math.abs(dz) < 1.4 && santaGroup.position.y < 1.2) {
+                    if (Math.abs(dx) < 1.3 && Math.abs(dz) < 1.4 && santaGroup.position.y < 2.2) {
                         gameRunning = false;
                         audio.stopBGM();
                         audio.crashBoomCinematic();
