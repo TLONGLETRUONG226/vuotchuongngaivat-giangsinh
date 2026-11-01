@@ -3,7 +3,7 @@ import streamlit.components.v1 as components
 
 # Cấu hình Streamlit tràn màn hình
 st.set_page_config(
-    page_title="Ông Già Noel Vượt Chướng Ngại Vật 3D",
+    page_title="Ông Già Noel Vượt Chướng Ngại Vật Phát Quà",
     page_icon="🎅",
     layout="wide",
     initial_sidebar_state="collapsed"
@@ -137,7 +137,6 @@ game_html = """
             font-weight: 700;
         }
         
-        /* Cấu hình Chọn Mức Độ Khó & Âm Thanh */
         .config-section {
             display: flex;
             flex-direction: column;
@@ -201,7 +200,6 @@ game_html = """
             box-shadow: 0 20px 45px rgba(56, 189, 248, 0.9);
         }
         
-        /* Phím Bấm Cảm Ứng */
         #controls-wrapper {
             position: absolute;
             bottom: 30px;
@@ -261,7 +259,6 @@ game_html = """
         </div>
     </div>
 
-    <!-- Nút Điều Khiển Màn Hình -->
     <div id="controls-wrapper">
         <div class="d-pad">
             <div class="ctrl-btn" id="btn-left">⬅️</div>
@@ -272,12 +269,10 @@ game_html = """
         </div>
     </div>
 
-    <!-- Màn Hình Khởi Đầu -->
     <div id="start-screen">
-        <h1>🎅 ÔNG GIÀ NOEL VƯỢT CHƯỚNG NGẠI VẬT</h1>
+        <h1>🎅 ÔNG GIÀ NOEL VƯỢT CHƯỚNG NGẠI VẬT 3D</h1>
         <div class="subtitle">hãy giúp ông vượt chướng ngại vật để ông phát quà nhé</div>
         
-        <!-- Cấu hình Mức độ khó & Âm thanh -->
         <div class="config-section">
             <div class="config-row">
                 <span class="config-label">⚡ Mức độ:</span>
@@ -300,7 +295,6 @@ game_html = """
         <button class="btn" onclick="startGame()">BẮT ĐẦU CHƠI 🚀</button>
     </div>
 
-    <!-- Màn Hình Thua -->
     <div id="gameover-screen" style="display: none;">
         <h1>💥 VA CHẠM CỰC MẠNH!</h1>
         <p>Đã xảy ra va chạm trên đường băng tuyết!<br><br>🎁 Tổng số quà thu thập: <b><span id="final-score">0</span></b></p>
@@ -330,7 +324,6 @@ game_html = """
             }
         }
 
-        // --- 1. ÂM THANH NỔ CINEMATIC ---
         class GameAudio {
             constructor() {
                 this.ctx = null;
@@ -399,7 +392,6 @@ game_html = """
             crashBoomCinematic() {
                 if (!soundEnabled || !this.ctx) return;
                 const now = this.ctx.currentTime;
-                
                 const osc1 = this.ctx.createOscillator();
                 const gain1 = this.ctx.createGain();
                 osc1.type = 'sine';
@@ -418,14 +410,12 @@ game_html = """
 
                 osc1.connect(gain1); gain1.connect(this.ctx.destination);
                 osc2.connect(gain2); gain2.connect(this.ctx.destination);
-                
                 osc1.start(now); osc2.start(now);
                 osc1.stop(now + 1.0); osc2.stop(now + 0.6);
             }
         }
         const audio = new GameAudio();
 
-        // --- 2. KHỞI TẠO THREE.JS ---
         const container = document.getElementById('canvas-container');
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0x010409);
@@ -444,7 +434,6 @@ game_html = """
         renderer.toneMappingExposure = 1.55;
         container.appendChild(renderer.domElement);
 
-        // --- 3. ÁNH SÁNG ---
         const ambientLight = new THREE.AmbientLight(0x38bdf8, 0.65);
         scene.add(ambientLight);
 
@@ -465,7 +454,6 @@ game_html = """
         moon.position.set(-35, 52, -130);
         scene.add(moon);
 
-        // --- 4. HỆ THỐNG TUYẾT RƠI ---
         const snowCount = 2000;
         const snowGeo = new THREE.BufferGeometry();
         const snowPos = new Float32Array(snowCount * 3);
@@ -482,7 +470,6 @@ game_html = """
         const snowSystem = new THREE.Points(snowGeo, snowMat);
         scene.add(snowSystem);
 
-        // --- 5. CHẤT LIỆU & ĐƯỜNG BĂNG ---
         const snowGroundMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.28, metalness: 0.05 });
         const iceTrackMat = new THREE.MeshStandardMaterial({ color: 0xbae6fd, roughness: 0.06, metalness: 0.4 });
         const laneDividerMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.65 });
@@ -491,8 +478,8 @@ game_html = """
         const pineLeafMat = new THREE.MeshStandardMaterial({ color: 0x064e3b, roughness: 0.45 });
         const snowCapMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.3 });
 
-        const luxuryGiftMat = new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.12, metalness: 0.35, emissive: 0x450a0a, emissiveIntensity: 0.3 });
-        const luxuryGoldRibbonMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.08, metalness: 0.98 });
+        const luxuryGiftMat = new THREE.MeshStandardMaterial({ color: 0xef4444, roughness: 0.15, metalness: 0.3, emissive: 0x500000, emissiveIntensity: 0.2 });
+        const luxuryGoldRibbonMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.05, metalness: 0.95 });
 
         const snowmanBodyMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.4 });
         const scarfMat = new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.25 });
@@ -503,8 +490,8 @@ game_html = """
         const santaRedMat = new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.25 });
         const skinMat = new THREE.MeshStandardMaterial({ color: 0xfed7aa, roughness: 0.5 });
         const whiteFurMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.85 });
-        const deerMat = new THREE.MeshStandardMaterial({ color: 0x78350f, roughness: 0.6 });
-        const antlerMat = new THREE.MeshStandardMaterial({ color: 0xb45309, roughness: 0.7 });
+        const deerMat = new THREE.MeshStandardMaterial({ color: 0x854d0e, roughness: 0.55 });
+        const antlerMat = new THREE.MeshStandardMaterial({ color: 0x451a03, roughness: 0.7 });
 
         const trackGeo = new THREE.PlaneGeometry(16, 300);
         const track = new THREE.Mesh(trackGeo, iceTrackMat);
@@ -529,11 +516,9 @@ game_html = """
             const tree = new THREE.Group();
             const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.55, 2.8), woodTrunkMat);
             trunk.position.y = 1.4; trunk.castShadow = true; tree.add(trunk);
-            
             for(let i = 0; i < 4; i++) {
                 const cone = new THREE.Mesh(new THREE.ConeGeometry(2.4 - i*0.45, 2.6, 12), pineLeafMat);
                 cone.position.y = 2.0 + i * 1.1; cone.castShadow = true; tree.add(cone);
-                
                 const snowCap = new THREE.Mesh(new THREE.ConeGeometry(2.1 - i*0.4, 0.6, 12), snowCapMat);
                 snowCap.position.y = 3.1 + i * 1.1; tree.add(snowCap);
             }
@@ -544,11 +529,9 @@ game_html = """
             const tree = new THREE.Group();
             const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.32, 0.48, 1.8), woodTrunkMat);
             trunk.position.y = 0.9; trunk.castShadow = true; tree.add(trunk);
-            
             for(let i = 0; i < 3; i++) {
                 const cone = new THREE.Mesh(new THREE.ConeGeometry(1.8 - i*0.32, 1.9, 12), pineLeafMat);
                 cone.position.y = 1.6 + i * 0.85; cone.castShadow = true; tree.add(cone);
-                
                 const snowCap = new THREE.Mesh(new THREE.ConeGeometry(1.55 - i*0.25, 0.5, 12), snowCapMat);
                 snowCap.position.y = 2.45 + i * 0.85; tree.add(snowCap);
             }
@@ -561,35 +544,28 @@ game_html = """
             const treeR = createSceneryPineTree(); treeR.position.set(11 + Math.random()*9, 0, z + 5); scene.add(treeR); sideDecorations.push(treeR);
         }
 
-        // --- 6. SANTA & BẦY 10 TUẦN LỘC (ĐỨNG GẦN NHAU HƠN) ---
+        // --- 6. SANTA & BẦY 10 TUẦN LỘC (ĐỨNG SÁT KHÍT NHAU & CHẠY 4 CHÂN) ---
         const santaGroup = new THREE.Group();
 
-        const sleighMesh = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.55, 2.1), santaRedMat);
-        sleighMesh.position.set(0, 0.45, 1.8); sleighMesh.castShadow = true; santaGroup.add(sleighMesh);
+        const sleighMesh = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.6, 2.4), santaRedMat);
+        sleighMesh.position.set(0, 0.5, 1.8); sleighMesh.castShadow = true; santaGroup.add(sleighMesh);
 
-        const runnerL = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.15, 2.5), luxuryGoldRibbonMat);
-        runnerL.position.set(-0.6, 0.15, 1.8); santaGroup.add(runnerL);
-        const runnerR = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.15, 2.5), luxuryGoldRibbonMat);
-        runnerR.position.set(0.6, 0.15, 1.8); santaGroup.add(runnerR);
+        const runnerL = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.18, 2.8), luxuryGoldRibbonMat);
+        runnerL.position.set(-0.65, 0.16, 1.8); santaGroup.add(runnerL);
+        const runnerR = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.18, 2.8), luxuryGoldRibbonMat);
+        runnerR.position.set(0.65, 0.16, 1.8); santaGroup.add(runnerR);
 
         const santaCharacter = new THREE.Group();
-        santaCharacter.position.set(0, 0, 0);
-
-        const santaTorso = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.4, 0.75), santaRedMat);
-        santaTorso.position.set(0, 0.85, 1.6); santaTorso.castShadow = true; santaCharacter.add(santaTorso);
-
+        const santaTorso = new THREE.Mesh(new THREE.CylinderGeometry(0.36, 0.42, 0.8), santaRedMat);
+        santaTorso.position.set(0, 0.9, 1.6); santaTorso.castShadow = true; santaCharacter.add(santaTorso);
         const santaHead = new THREE.Mesh(new THREE.SphereGeometry(0.3, 16, 16), skinMat);
-        santaHead.position.set(0, 1.4, 1.6); santaCharacter.add(santaHead);
-
+        santaHead.position.set(0, 1.45, 1.6); santaCharacter.add(santaHead);
         const santaBeard = new THREE.Mesh(new THREE.SphereGeometry(0.32, 16, 16), whiteFurMat);
-        santaBeard.position.set(0, 1.3, 1.75); santaCharacter.add(santaBeard);
-
-        const santaHat = new THREE.Mesh(new THREE.ConeGeometry(0.32, 0.6, 16), santaRedMat);
-        santaHat.position.set(0, 1.8, 1.55); santaHat.rotation.x = -0.3; santaCharacter.add(santaHat);
-
-        const sack = new THREE.Mesh(new THREE.SphereGeometry(0.48, 16, 16), new THREE.MeshStandardMaterial({color: 0x16a34a, roughness: 0.6}));
-        sack.position.set(0, 0.85, 2.35); santaCharacter.add(sack);
-
+        santaBeard.position.set(0, 1.32, 1.76); santaCharacter.add(santaBeard);
+        const santaHat = new THREE.Mesh(new THREE.ConeGeometry(0.32, 0.65, 16), santaRedMat);
+        santaHat.position.set(0, 1.88, 1.55); santaHat.rotation.x = -0.3; santaCharacter.add(santaHat);
+        const sack = new THREE.Mesh(new THREE.SphereGeometry(0.5, 16, 16), new THREE.MeshStandardMaterial({color: 0x15803d, roughness: 0.6}));
+        sack.position.set(0, 0.9, 2.4); santaCharacter.add(sack);
         santaGroup.add(santaCharacter);
 
         const reindeers = [];
@@ -597,49 +573,58 @@ game_html = """
 
         function createPhotorealisticReindeer(x, z, isRudolph = false) {
             const deer = new THREE.Group();
-            const body = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.6, 1.3), deerMat);
-            body.position.set(x, 0.8, z); body.castShadow = true; deer.add(body);
+            
+            const body = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.5, 1.1), deerMat);
+            body.position.set(x, 0.75, z); body.castShadow = true; deer.add(body);
 
-            const head = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.45, 0.5), deerMat);
-            head.position.set(x, 1.3, z - 0.6); deer.add(head);
+            const head = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.35, 0.42), deerMat);
+            head.position.set(x, 1.2, z - 0.5); deer.add(head);
 
             if(isRudolph) {
-                const nose = new THREE.Mesh(new THREE.SphereGeometry(0.13, 16, 16), new THREE.MeshBasicMaterial({ color: 0xef4444 }));
-                nose.position.set(x, 1.3, z - 0.92); deer.add(nose);
+                const nose = new THREE.Mesh(new THREE.SphereGeometry(0.1, 16, 16), new THREE.MeshBasicMaterial({ color: 0xef4444 }));
+                nose.position.set(x, 1.2, z - 0.78); deer.add(nose);
             }
 
-            const antlerL = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.45, 0.08), antlerMat);
-            antlerL.position.set(x - 0.2, 1.75, z - 0.6); antlerL.rotation.z = -0.3; deer.add(antlerL);
+            const antlerL = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.4, 0.06), antlerMat);
+            antlerL.position.set(x - 0.16, 1.6, z - 0.5); antlerL.rotation.z = -0.35; deer.add(antlerL);
+            const antlerR = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.4, 0.06), antlerMat);
+            antlerR.position.set(x + 0.16, 1.6, z - 0.5); antlerR.rotation.z = 0.35; deer.add(antlerR);
 
-            const antlerR = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.45, 0.08), antlerMat);
-            antlerR.position.set(x + 0.2, 1.75, z - 0.6); antlerR.rotation.z = 0.3; deer.add(antlerR);
+            // 4 CHÂN CHÂN THẬT
+            const legGeo = new THREE.CylinderGeometry(0.05, 0.04, 0.6);
+            const legFL = new THREE.Mesh(legGeo, deerMat); legFL.position.set(x - 0.2, 0.3, z - 0.35); deer.add(legFL);
+            const legFR = new THREE.Mesh(legGeo, deerMat); legFR.position.set(x + 0.2, 0.3, z - 0.35); deer.add(legFR);
+            const legBL = new THREE.Mesh(legGeo, deerMat); legBL.position.set(x - 0.2, 0.3, z + 0.35); deer.add(legBL);
+            const legBR = new THREE.Mesh(legGeo, deerMat); legBR.position.set(x + 0.2, 0.3, z + 0.35); deer.add(legBR);
 
             const angle = Math.random() * Math.PI * 2;
             const speedVel = 0.15 + Math.random() * 0.15;
             deer.userData = { 
                 origX: x, origZ: z, 
                 vx: Math.cos(angle) * speedVel, 
-                vz: Math.sin(angle) * speedVel 
+                vz: Math.sin(angle) * speedVel,
+                legs: [legFL, legFR, legBL, legBR],
+                offset: Math.random() * Math.PI
             };
             reindeers.push(deer);
             return deer;
         }
 
-        // 10 Con tuần lộc đứng sát gần nhau (Khoảng cách trục X: 0.35, khoảng cách hàng Z: 0.65)
-        reindeerSquad.add(createPhotorealisticReindeer(-0.35, 0.4));
-        reindeerSquad.add(createPhotorealisticReindeer(0.35, 0.4));
+        // ĐỘI HÌNH 10 TUẦN LỘC XÍC LẠI THẬT GẦN NHAU (Khoảng cách X = 0.32, Z = 0.6)
+        reindeerSquad.add(createPhotorealisticReindeer(-0.32, 0.4));
+        reindeerSquad.add(createPhotorealisticReindeer(0.32, 0.4));
 
-        reindeerSquad.add(createPhotorealisticReindeer(-0.35, -0.25));
-        reindeerSquad.add(createPhotorealisticReindeer(0.35, -0.25));
+        reindeerSquad.add(createPhotorealisticReindeer(-0.32, -0.2));
+        reindeerSquad.add(createPhotorealisticReindeer(0.32, -0.2));
 
-        reindeerSquad.add(createPhotorealisticReindeer(-0.35, -0.9));
-        reindeerSquad.add(createPhotorealisticReindeer(0.35, -0.9));
+        reindeerSquad.add(createPhotorealisticReindeer(-0.32, -0.8));
+        reindeerSquad.add(createPhotorealisticReindeer(0.32, -0.8));
 
-        reindeerSquad.add(createPhotorealisticReindeer(-0.35, -1.55));
-        reindeerSquad.add(createPhotorealisticReindeer(0.35, -1.55));
+        reindeerSquad.add(createPhotorealisticReindeer(-0.32, -1.4));
+        reindeerSquad.add(createPhotorealisticReindeer(0.32, -1.4));
 
-        reindeerSquad.add(createPhotorealisticReindeer(-0.35, -2.2, true));
-        reindeerSquad.add(createPhotorealisticReindeer(0.35, -2.2, true));
+        reindeerSquad.add(createPhotorealisticReindeer(-0.32, -2.0, true));
+        reindeerSquad.add(createPhotorealisticReindeer(0.32, -2.0, true));
 
         santaGroup.add(reindeerSquad);
 
@@ -654,7 +639,6 @@ game_html = """
         let crashedGifts = [];
         let activeCrashType = null;
 
-        // --- 7. ĐIỀU KHIỂN & LÀN ĐƯỜNG ---
         let gameRunning = false;
         let isGameOverAnim = false;
         let score = 0, distance = 0, speed = 0.38, accelerationRate = 0.00008;
@@ -715,7 +699,28 @@ game_html = """
             if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') canMoveRight = true;
         });
 
-        // --- 8. TẠO VẬT CẢN & HỘP QUÀ ---
+        // HỘP QUÀ 3D TỰ NHIÊN CHÂN THẬT
+        function createGift3D() {
+            const giftGroup = new THREE.Group();
+            
+            const box = new THREE.Mesh(new THREE.BoxGeometry(1.2, 1.2, 1.2), luxuryGiftMat);
+            box.position.y = 0.6; box.castShadow = true; giftGroup.add(box);
+
+            const ribbonV = new THREE.Mesh(new THREE.BoxGeometry(1.24, 1.24, 0.22), luxuryGoldRibbonMat);
+            ribbonV.position.y = 0.6; giftGroup.add(ribbonV);
+
+            const ribbonH = new THREE.Mesh(new THREE.BoxGeometry(0.22, 1.24, 1.24), luxuryGoldRibbonMat);
+            ribbonH.position.y = 0.6; giftGroup.add(ribbonH);
+
+            const bowTop = new THREE.Mesh(new THREE.SphereGeometry(0.28, 16, 16), luxuryGoldRibbonMat);
+            bowTop.position.y = 1.28; giftGroup.add(bowTop);
+
+            const giftLight = new THREE.PointLight(0xfacc15, 1.2, 4);
+            giftLight.position.y = 0.8; giftGroup.add(giftLight);
+
+            return giftGroup;
+        }
+
         function spawnEntities() {
             if (!gameRunning || isGameOverAnim) return;
             const laneIdx = Math.floor(Math.random() * lanes.length);
@@ -734,10 +739,8 @@ game_html = """
                 } else if (type < 0.75) {
                     const bodyLower = new THREE.Mesh(new THREE.SphereGeometry(1.25, 24, 24), snowmanBodyMat);
                     bodyLower.position.y = 1.25; bodyLower.castShadow = true; obsGroup.add(bodyLower);
-
                     const bodyUpper = new THREE.Mesh(new THREE.SphereGeometry(0.9, 24, 24), snowmanBodyMat);
                     bodyUpper.position.y = 2.65; bodyUpper.castShadow = true; obsGroup.add(bodyUpper);
-
                     const head = new THREE.Mesh(new THREE.SphereGeometry(0.62, 24, 24), snowmanBodyMat);
                     head.position.y = 3.6; head.castShadow = true; obsGroup.add(head);
 
@@ -752,8 +755,7 @@ game_html = """
                     eyeR.position.set(0.18, 3.75, 0.52); obsGroup.add(eyeR);
 
                     const nose = new THREE.Mesh(new THREE.ConeGeometry(0.08, 0.45, 16), carrotMat);
-                    nose.rotation.x = Math.PI / 2;
-                    nose.position.set(0, 3.6, 0.72); obsGroup.add(nose);
+                    nose.rotation.x = Math.PI / 2; nose.position.set(0, 3.6, 0.72); obsGroup.add(nose);
 
                     for(let m = -1; m <= 1; m++) {
                         const mouthDot = new THREE.Mesh(new THREE.SphereGeometry(0.03, 8, 8), coalMat);
@@ -766,7 +768,6 @@ game_html = """
                     hatTop.position.y = 4.25; obsGroup.add(hatTop);
 
                     obsGroup.userData = { type: 'high' };
-
                 } else {
                     const rock = new THREE.Mesh(new THREE.DodecahedronGeometry(1.2), new THREE.MeshStandardMaterial({ color: 0x64748b, roughness: 0.8 }));
                     rock.position.y = 0.9; rock.castShadow = true; obsGroup.add(rock);
@@ -777,30 +778,13 @@ game_html = """
                 scene.add(obsGroup);
                 obstacles.push(obsGroup);
             } else {
-                const giftGroup = new THREE.Group();
-                const box = new THREE.Mesh(new THREE.BoxGeometry(1.25, 1.25, 1.25), luxuryGiftMat);
-                box.position.y = 0.62; box.castShadow = true; giftGroup.add(box);
-
-                const ribbonV = new THREE.Mesh(new THREE.BoxGeometry(1.31, 1.31, 0.24), luxuryGoldRibbonMat);
-                ribbonV.position.y = 0.62; giftGroup.add(ribbonV);
-
-                const ribbonH = new THREE.Mesh(new THREE.BoxGeometry(0.24, 1.31, 1.31), luxuryGoldRibbonMat);
-                ribbonH.position.y = 0.62; giftGroup.add(ribbonH);
-
-                const bowTop = new THREE.Mesh(new THREE.SphereGeometry(0.3, 16, 16), luxuryGoldRibbonMat);
-                bowTop.position.y = 1.34; giftGroup.add(bowTop);
-
-                const giftLight = new THREE.PointLight(0xfacc15, 1.0, 5);
-                giftLight.position.y = 0.8;
-                giftGroup.add(giftLight);
-
+                const giftGroup = createGift3D();
                 giftGroup.position.set(xPos, 0, zPos);
                 scene.add(giftGroup);
                 gifts.push(giftGroup);
             }
         }
 
-        // --- KÍCH HOẠT HIỆU ỨNG THUA ---
         function triggerGameOverEffect(obstacleType) {
             gameRunning = false;
             isGameOverAnim = true;
@@ -814,26 +798,21 @@ game_html = """
             if (obstacleType === 'rock') {
                 sleighMesh.rotation.z = -Math.PI / 2.2;
                 sleighMesh.position.y = 0.2;
-
                 santaCharacter.position.set(0, 0.35, -2.4);
                 santaCharacter.rotation.set(Math.PI / 2, 0, 0);
             } else {
                 sleighMesh.position.y = 2.4;
                 sleighMesh.rotation.x = Math.PI / 35;
                 sleighMesh.rotation.z = -Math.PI / 6;
-
                 santaCharacter.position.set(0.8, 0.3, -1.8);
                 santaCharacter.rotation.set(Math.PI / 2.2, 0.4, 0);
             }
 
             for (let i = 0; i < 20; i++) {
-                const miniGift = new THREE.Mesh(
-                    new THREE.BoxGeometry(0.55, 0.55, 0.55),
-                    Math.random() > 0.4 ? luxuryGiftMat : luxuryGoldRibbonMat
-                );
+                const miniGift = createGift3D();
                 miniGift.position.set(
                     santaGroup.position.x + (Math.random() - 0.5) * 6.0,
-                    0.28,
+                    0.2,
                     santaGroup.position.z + (Math.random() - 0.5) * 6.0
                 );
                 miniGift.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, 0);
@@ -868,7 +847,7 @@ game_html = """
             }
 
             sleighMesh.rotation.set(0, 0, 0);
-            sleighMesh.position.set(0, 0.45, 1.8);
+            sleighMesh.position.set(0, 0.5, 1.8);
 
             santaCharacter.position.set(0, 0, 0);
             santaCharacter.rotation.set(0, 0, 0);
@@ -896,9 +875,10 @@ game_html = """
 
         setInterval(spawnEntities, 1000);
 
-        // --- 9. VÒNG LẶP ANIMATION ---
         function animate() {
             requestAnimationFrame(animate);
+
+            const time = Date.now() * 0.01;
 
             const pos = snowGeo.attributes.position.array;
             for(let i = 0; i < snowCount; i++) {
@@ -917,6 +897,15 @@ game_html = """
                 const targetX = lanes[currentLane];
                 santaGroup.position.x += (targetX - santaGroup.position.x) * 0.2;
                 santaGroup.rotation.z = (santaGroup.position.x - targetX) * 0.03;
+
+                // CHUYỂN ĐỘNG NƯỚC ĐẠI 4 CHÂN TUẦN LỘC
+                reindeers.forEach((d) => {
+                    const legCycle = Math.sin(time * 2.5 + d.userData.offset) * 0.35;
+                    d.userData.legs[0].rotation.x = legCycle;
+                    d.userData.legs[1].rotation.x = -legCycle;
+                    d.userData.legs[2].rotation.x = -legCycle;
+                    d.userData.legs[3].rotation.x = legCycle;
+                });
 
                 if (isJumping) {
                     santaGroup.position.y += jumpVelocity;
@@ -954,7 +943,7 @@ game_html = """
 
                 for (let i = gifts.length - 1; i >= 0; i--) {
                     gifts[i].position.z += speed;
-                    gifts[i].rotation.y += 0.05;
+                    gifts[i].rotation.y += 0.04;
 
                     let dx = santaGroup.position.x - gifts[i].position.x;
                     let dz = santaGroup.position.z - gifts[i].position.z;
@@ -992,5 +981,4 @@ game_html = """
 </html>
 """
 
-# Render trong Streamlit
 components.html(game_html, height=750, scrolling=False)
