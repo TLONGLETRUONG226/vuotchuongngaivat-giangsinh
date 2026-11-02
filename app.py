@@ -121,6 +121,14 @@ game_html = """
             margin-bottom: 4px;
             filter: drop-shadow(0 15px 25px rgba(56, 189, 248, 0.6));
         }
+        #gameover-screen h1 {
+            font-size: 32px;
+            max-width: 750px;
+            line-height: 1.35;
+            background: linear-gradient(135deg, #ef4444 0%, #f97316 50%, #facc15 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
         .subtitle {
             font-size: 16px;
             color: #facc15;
@@ -332,8 +340,8 @@ game_html = """
     </div>
 
     <div id="gameover-screen" style="display: none;">
-        <h1>💥 VA CHẠM CỰC MẠNH!</h1>
-        <p>Đã xảy ra va chạm trên đường băng tuyết!<br><br>🎁 Tổng số quà thu thập: <b><span id="final-score">0</span></b></p>
+        <h1>ĐÙNGG! ÔNG GIÀ NOEL ĐÃ VA CHẠM VỚI CHƯỚNG NGẠI VẬT VÀ ĐÃ BỊ HƯ XE MẤT RỒI!!</h1>
+        <p style="margin-top: 12px;">🎁 Tổng số quà thu thập: <b><span id="final-score">0</span></b></p>
         <button class="btn" onclick="restartGame()">CHƠI LẠI 🔄</button>
     </div>
 
