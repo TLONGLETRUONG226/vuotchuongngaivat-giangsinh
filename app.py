@@ -279,7 +279,7 @@ game_html = """
                 <div class="btn-group">
                     <button class="option-btn" id="diff-easy" onclick="setDifficulty('easy')">Dễ</button>
                     <button class="option-btn" id="diff-medium" onclick="setDifficulty('medium')">Trung bình</button>
-                    <button class="option-btn active" id="diff-hard" onclick="setDifficulty('hard')">Khó</button>
+                    <button class="option-btn active" id="diff-hard" onclick="setDifficulty('hard')">Khó (Siêu Tốc 1.0)</button>
                 </div>
             </div>
             <div class="config-row">
@@ -634,7 +634,7 @@ game_html = """
 
         let gameRunning = false;
         let isGameOverAnim = false;
-        let score = 0, distance = 0, speed = 0.52, accelerationRate = 0.00035; // Tốc độ & gia tốc siêu khó
+        let score = 0, distance = 0, speed = 1.0, accelerationRate = 0.005; // Tốc độ xuất phát 1.0 & Gia tốc 0.005
         
         const lanes = [-5.0, 0, 5.0];
         let currentLane = 1;
@@ -719,7 +719,7 @@ game_html = """
             const zPos = -140;
 
             const randType = Math.random();
-            if (randType < 0.6) {
+            if (randType < 0.65) {
                 const obsGroup = new THREE.Group();
                 const type = Math.random();
 
@@ -826,9 +826,16 @@ game_html = """
             score = 0; distance = 0; currentLane = 1;
             activeCrashType = null;
 
-            // Đặt mức độ siêu khó cố định khi bắt đầu
-            speed = 0.52;
-            accelerationRate = 0.00035;
+            if (selectedDifficulty === 'easy') {
+                speed = 0.38;
+                accelerationRate = 0.00008;
+            } else if (selectedDifficulty === 'medium') {
+                speed = 0.54;
+                accelerationRate = 0.0002;
+            } else if (selectedDifficulty === 'hard') {
+                speed = 1.0;
+                accelerationRate = 0.005;
+            }
 
             sleighMesh.rotation.set(0, 0, 0);
             sleighMesh.position.set(0, 0.5, 1.8);
@@ -857,8 +864,7 @@ game_html = """
             document.getElementById('start-screen').style.display = 'flex';
         }
 
-        // Tần suất xuất hiện chướng ngại vật dày đặc hơn (500ms mỗi lượt spawn)
-        setInterval(spawnEntities, 550);
+        setInterval(spawnEntities, 380);
 
         function animate() {
             requestAnimationFrame(animate);
@@ -874,17 +880,17 @@ game_html = """
             snowGeo.attributes.position.needsUpdate = true;
 
             if (gameRunning) {
-                distance += 1.2; 
+                distance += 2.0; 
                 speed += accelerationRate; 
                 document.getElementById('distance').innerText = Math.floor(distance / 10);
                 document.getElementById('score').innerText = score;
 
                 const targetX = lanes[currentLane];
-                santaGroup.position.x += (targetX - santaGroup.position.x) * 0.25;
-                santaGroup.rotation.z = (santaGroup.position.x - targetX) * 0.03;
+                santaGroup.position.x += (targetX - santaGroup.position.x) * 0.3;
+                santaGroup.rotation.z = (santaGroup.position.x - targetX) * 0.04;
 
                 reindeers.forEach((d) => {
-                    const legCycle = Math.sin(time * 3.5 + d.userData.offset) * 0.4;
+                    const legCycle = Math.sin(time * 5.5 + d.userData.offset) * 0.5;
                     d.userData.legs[0].rotation.x = legCycle;
                     d.userData.legs[1].rotation.x = -legCycle;
                     d.userData.legs[2].rotation.x = -legCycle;
@@ -927,7 +933,7 @@ game_html = """
 
                 for (let i = gifts.length - 1; i >= 0; i--) {
                     gifts[i].position.z += speed;
-                    gifts[i].rotation.y += 0.06;
+                    gifts[i].rotation.y += 0.1;
 
                     let dx = santaGroup.position.x - gifts[i].position.x;
                     let dz = santaGroup.position.z - gifts[i].position.z;
