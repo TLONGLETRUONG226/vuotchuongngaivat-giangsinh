@@ -342,7 +342,7 @@ game_html = """
     <div id="gameover-screen" style="display: none;">
         <h1>ĐÙNGG! ÔNG GIÀ NOEL ĐÃ VA CHẠM VỚI CHƯỚNG NGẠI VẬT VÀ ĐÃ BỊ HƯ XE MẤT RỒI!!</h1>
         <p style="margin-top: 12px;">🎁 Tổng số quà thu thập: <b><span id="final-score">0</span></b></p>
-        <button class="btn" onclick="restartGame()">CHƠI LẠI 🔄</button>
+        <button class="btn" onclick="restartGame()">HÃY THỬ GIÚP ÔNG GIÀ NOEL ĐI PHÁT QUÀ LẠI NÀO 🔄</button>
     </div>
 
     <script>
