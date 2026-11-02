@@ -143,7 +143,7 @@ game_html = """
             gap: 10px;
             margin-bottom: 20px;
             width: 100%;
-            max-width: 440px;
+            max-width: 500px;
         }
         .config-row {
             display: flex;
@@ -162,12 +162,13 @@ game_html = """
         .btn-group {
             display: flex;
             gap: 6px;
+            flex-wrap: wrap;
         }
         .option-btn {
             background: rgba(15, 23, 42, 0.8);
             border: 2px solid rgba(255, 255, 255, 0.3);
             color: #cbd5e1;
-            padding: 6px 14px;
+            padding: 6px 12px;
             font-size: 13px;
             font-weight: 800;
             border-radius: 10px;
@@ -179,6 +180,12 @@ game_html = """
             color: #0f172a;
             border-color: #38bdf8;
             box-shadow: 0 0 12px rgba(56, 189, 248, 0.6);
+        }
+        .option-btn.extreme.active {
+            background: linear-gradient(135deg, #ef4444 0%, #f59e0b 100%);
+            color: #ffffff;
+            border-color: #ef4444;
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.8);
         }
 
         .btn {
@@ -279,7 +286,8 @@ game_html = """
                 <div class="btn-group">
                     <button class="option-btn" id="diff-easy" onclick="setDifficulty('easy')">Dễ</button>
                     <button class="option-btn" id="diff-medium" onclick="setDifficulty('medium')">Trung bình</button>
-                    <button class="option-btn active" id="diff-hard" onclick="setDifficulty('hard')">Khó (Siêu Tốc 1.0)</button>
+                    <button class="option-btn" id="diff-hard" onclick="setDifficulty('hard')">Khó</button>
+                    <button class="option-btn extreme active" id="diff-ultimate" onclick="setDifficulty('ultimate')">⚡ Cực Đại (2.0)</button>
                 </div>
             </div>
             <div class="config-row">
@@ -302,14 +310,16 @@ game_html = """
     </div>
 
     <script>
-        let selectedDifficulty = 'hard'; 
+        let selectedDifficulty = 'ultimate'; 
         let soundEnabled = true;
+        let spawnIntervalId = null;
 
         function setDifficulty(level) {
             selectedDifficulty = level;
             document.getElementById('diff-easy').classList.remove('active');
             document.getElementById('diff-medium').classList.remove('active');
             document.getElementById('diff-hard').classList.remove('active');
+            document.getElementById('diff-ultimate').classList.remove('active');
             document.getElementById('diff-' + level).classList.add('active');
         }
 
@@ -634,7 +644,7 @@ game_html = """
 
         let gameRunning = false;
         let isGameOverAnim = false;
-        let score = 0, distance = 0, speed = 1.0, accelerationRate = 0.005; // Tốc độ xuất phát 1.0 & Gia tốc 0.005
+        let score = 0, distance = 0, speed = 2.0, accelerationRate = 0.005;
         
         const lanes = [-5.0, 0, 5.0];
         let currentLane = 1;
@@ -780,6 +790,7 @@ game_html = """
             gameRunning = false;
             isGameOverAnim = true;
             activeCrashType = obstacleType;
+            if (spawnIntervalId) clearInterval(spawnIntervalId);
             audio.stopBGM();
             audio.crashBoomCinematic();
 
@@ -826,16 +837,28 @@ game_html = """
             score = 0; distance = 0; currentLane = 1;
             activeCrashType = null;
 
+            let spawnDelay = 400;
+
             if (selectedDifficulty === 'easy') {
                 speed = 0.38;
                 accelerationRate = 0.00008;
+                spawnDelay = 500;
             } else if (selectedDifficulty === 'medium') {
                 speed = 0.54;
                 accelerationRate = 0.0002;
+                spawnDelay = 420;
             } else if (selectedDifficulty === 'hard') {
                 speed = 1.0;
                 accelerationRate = 0.005;
+                spawnDelay = 350;
+            } else if (selectedDifficulty === 'ultimate') {
+                speed = 2.0;
+                accelerationRate = 0.005;
+                spawnDelay = 280;
             }
+
+            if (spawnIntervalId) clearInterval(spawnIntervalId);
+            spawnIntervalId = setInterval(spawnEntities, spawnDelay);
 
             sleighMesh.rotation.set(0, 0, 0);
             sleighMesh.position.set(0, 0.5, 1.8);
@@ -864,8 +887,6 @@ game_html = """
             document.getElementById('start-screen').style.display = 'flex';
         }
 
-        setInterval(spawnEntities, 380);
-
         function animate() {
             requestAnimationFrame(animate);
 
@@ -880,17 +901,18 @@ game_html = """
             snowGeo.attributes.position.needsUpdate = true;
 
             if (gameRunning) {
-                distance += 2.0; 
+                distance += (speed * 2.0); 
                 speed += accelerationRate; 
                 document.getElementById('distance').innerText = Math.floor(distance / 10);
                 document.getElementById('score').innerText = score;
 
                 const targetX = lanes[currentLane];
-                santaGroup.position.x += (targetX - santaGroup.position.x) * 0.3;
+                const lerpSpeed = selectedDifficulty === 'ultimate' ? 0.45 : 0.3;
+                santaGroup.position.x += (targetX - santaGroup.position.x) * lerpSpeed;
                 santaGroup.rotation.z = (santaGroup.position.x - targetX) * 0.04;
 
                 reindeers.forEach((d) => {
-                    const legCycle = Math.sin(time * 5.5 + d.userData.offset) * 0.5;
+                    const legCycle = Math.sin(time * 6.5 + d.userData.offset) * 0.55;
                     d.userData.legs[0].rotation.x = legCycle;
                     d.userData.legs[1].rotation.x = -legCycle;
                     d.userData.legs[2].rotation.x = -legCycle;
@@ -933,7 +955,7 @@ game_html = """
 
                 for (let i = gifts.length - 1; i >= 0; i--) {
                     gifts[i].position.z += speed;
-                    gifts[i].rotation.y += 0.1;
+                    gifts[i].rotation.y += 0.12;
 
                     let dx = santaGroup.position.x - gifts[i].position.x;
                     let dz = santaGroup.position.z - gifts[i].position.z;
