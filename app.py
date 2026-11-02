@@ -277,9 +277,9 @@ game_html = """
             <div class="config-row">
                 <span class="config-label">⚡ Mức độ:</span>
                 <div class="btn-group">
-                    <button class="option-btn active" id="diff-easy" onclick="setDifficulty('easy')">Dễ</button>
+                    <button class="option-btn" id="diff-easy" onclick="setDifficulty('easy')">Dễ</button>
                     <button class="option-btn" id="diff-medium" onclick="setDifficulty('medium')">Trung bình</button>
-                    <button class="option-btn" id="diff-hard" onclick="setDifficulty('hard')">Khó</button>
+                    <button class="option-btn active" id="diff-hard" onclick="setDifficulty('hard')">Khó</button>
                 </div>
             </div>
             <div class="config-row">
@@ -302,7 +302,7 @@ game_html = """
     </div>
 
     <script>
-        let selectedDifficulty = 'easy'; 
+        let selectedDifficulty = 'hard'; 
         let soundEnabled = true;
 
         function setDifficulty(level) {
@@ -544,7 +544,6 @@ game_html = """
             const treeR = createSceneryPineTree(); treeR.position.set(11 + Math.random()*9, 0, z + 5); scene.add(treeR); sideDecorations.push(treeR);
         }
 
-        // --- 6. SANTA & BẦY 10 TUẦN LỘC ---
         const santaGroup = new THREE.Group();
 
         const sleighMesh = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.6, 2.4), santaRedMat);
@@ -635,7 +634,7 @@ game_html = """
 
         let gameRunning = false;
         let isGameOverAnim = false;
-        let score = 0, distance = 0, speed = 0.38, accelerationRate = 0.00008;
+        let score = 0, distance = 0, speed = 0.52, accelerationRate = 0.00035; // Tốc độ & gia tốc siêu khó
         
         const lanes = [-5.0, 0, 5.0];
         let currentLane = 1;
@@ -788,13 +787,11 @@ game_html = """
             crashedGifts = [];
 
             if (obstacleType === 'rock') {
-                // Hiệu ứng khi đụng cục đá: Xe lật nhẹ nghiêng trên mặt đường, ông già Noel ngả người lên trên rõ ràng
                 sleighMesh.rotation.set(0.3, 0, -Math.PI / 2.5);
                 sleighMesh.position.set(0, 0.6, 1.8);
                 santaCharacter.position.set(0, 0.8, 1.2);
                 santaCharacter.rotation.set(Math.PI / 3, 0, 0.2);
             } else {
-                // Hiệu ứng khi đụng cây/người tuyết
                 sleighMesh.position.y = 2.4;
                 sleighMesh.rotation.x = Math.PI / 35;
                 sleighMesh.rotation.z = -Math.PI / 6;
@@ -829,16 +826,9 @@ game_html = """
             score = 0; distance = 0; currentLane = 1;
             activeCrashType = null;
 
-            if (selectedDifficulty === 'easy') {
-                speed = 0.34;
-                accelerationRate = 0.00006;
-            } else if (selectedDifficulty === 'medium') {
-                speed = 0.44;
-                accelerationRate = 0.00012;
-            } else if (selectedDifficulty === 'hard') {
-                speed = 0.55;
-                accelerationRate = 0.00022;
-            }
+            // Đặt mức độ siêu khó cố định khi bắt đầu
+            speed = 0.52;
+            accelerationRate = 0.00035;
 
             sleighMesh.rotation.set(0, 0, 0);
             sleighMesh.position.set(0, 0.5, 1.8);
@@ -867,7 +857,8 @@ game_html = """
             document.getElementById('start-screen').style.display = 'flex';
         }
 
-        setInterval(spawnEntities, 1000);
+        // Tần suất xuất hiện chướng ngại vật dày đặc hơn (500ms mỗi lượt spawn)
+        setInterval(spawnEntities, 550);
 
         function animate() {
             requestAnimationFrame(animate);
@@ -883,17 +874,17 @@ game_html = """
             snowGeo.attributes.position.needsUpdate = true;
 
             if (gameRunning) {
-                distance += 0.85; 
+                distance += 1.2; 
                 speed += accelerationRate; 
                 document.getElementById('distance').innerText = Math.floor(distance / 10);
                 document.getElementById('score').innerText = score;
 
                 const targetX = lanes[currentLane];
-                santaGroup.position.x += (targetX - santaGroup.position.x) * 0.2;
+                santaGroup.position.x += (targetX - santaGroup.position.x) * 0.25;
                 santaGroup.rotation.z = (santaGroup.position.x - targetX) * 0.03;
 
                 reindeers.forEach((d) => {
-                    const legCycle = Math.sin(time * 2.5 + d.userData.offset) * 0.35;
+                    const legCycle = Math.sin(time * 3.5 + d.userData.offset) * 0.4;
                     d.userData.legs[0].rotation.x = legCycle;
                     d.userData.legs[1].rotation.x = -legCycle;
                     d.userData.legs[2].rotation.x = -legCycle;
@@ -936,7 +927,7 @@ game_html = """
 
                 for (let i = gifts.length - 1; i >= 0; i--) {
                     gifts[i].position.z += speed;
-                    gifts[i].rotation.y += 0.04;
+                    gifts[i].rotation.y += 0.06;
 
                     let dx = santaGroup.position.x - gifts[i].position.x;
                     let dz = santaGroup.position.z - gifts[i].position.z;
