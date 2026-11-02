@@ -202,6 +202,20 @@ game_html = """
             box-shadow: 0 0 18px rgba(255, 255, 255, 0.5);
         }
 
+        /* Màu sắc cho nút Bật/Tắt âm thanh */
+        .option-btn.sound-on.active {
+            background: #22c55e;
+            color: #ffffff;
+            border-color: #22c55e;
+            box-shadow: 0 0 15px rgba(34, 197, 94, 0.8);
+        }
+        .option-btn.sound-off.active {
+            background: #ef4444;
+            color: #ffffff;
+            border-color: #ef4444;
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.8);
+        }
+
         .btn {
             background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
             color: white;
@@ -307,8 +321,8 @@ game_html = """
             <div class="config-row">
                 <span class="config-label">🔊 Âm thanh:</span>
                 <div class="btn-group">
-                    <button class="option-btn active" id="sound-on" onclick="setSound(true)">Bật</button>
-                    <button class="option-btn" id="sound-off" onclick="setSound(false)">Tắt</button>
+                    <button class="option-btn sound-on active" id="sound-on" onclick="setSound(true)">Bật</button>
+                    <button class="option-btn sound-off" id="sound-off" onclick="setSound(false)">Tắt</button>
                 </div>
             </div>
         </div>
@@ -345,6 +359,7 @@ game_html = """
                 document.getElementById('sound-on').classList.add('active');
             } else {
                 document.getElementById('sound-off').classList.add('active');
+                audio.stopBGM();
             }
         }
 
