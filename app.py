@@ -175,17 +175,31 @@ game_html = """
             cursor: pointer;
             transition: all 0.2s ease;
         }
-        .option-btn.active {
-            background: #38bdf8;
-            color: #0f172a;
-            border-color: #38bdf8;
-            box-shadow: 0 0 12px rgba(56, 189, 248, 0.6);
+        
+        /* Màu sắc riêng cho từng chế độ khi được chọn */
+        .option-btn.easy.active {
+            background: #22c55e;
+            color: #ffffff;
+            border-color: #22c55e;
+            box-shadow: 0 0 15px rgba(34, 197, 94, 0.8);
         }
-        .option-btn.extreme.active {
-            background: linear-gradient(135deg, #ef4444 0%, #f59e0b 100%);
+        .option-btn.medium.active {
+            background: #f97316;
+            color: #ffffff;
+            border-color: #f97316;
+            box-shadow: 0 0 15px rgba(249, 115, 22, 0.8);
+        }
+        .option-btn.hard.active {
+            background: #ef4444;
             color: #ffffff;
             border-color: #ef4444;
             box-shadow: 0 0 15px rgba(239, 68, 68, 0.8);
+        }
+        .option-btn.ultimate.active {
+            background: #111827;
+            color: #ffffff;
+            border-color: #374151;
+            box-shadow: 0 0 18px rgba(255, 255, 255, 0.5);
         }
 
         .btn {
@@ -284,10 +298,10 @@ game_html = """
             <div class="config-row">
                 <span class="config-label">⚡ Mức độ:</span>
                 <div class="btn-group">
-                    <button class="option-btn" id="diff-easy" onclick="setDifficulty('easy')">Dễ</button>
-                    <button class="option-btn" id="diff-medium" onclick="setDifficulty('medium')">Trung bình</button>
-                    <button class="option-btn" id="diff-hard" onclick="setDifficulty('hard')">Khó</button>
-                    <button class="option-btn extreme active" id="diff-ultimate" onclick="setDifficulty('ultimate')">⚡ Cực Đại (2.0)</button>
+                    <button class="option-btn easy" id="diff-easy" onclick="setDifficulty('easy')">Dễ</button>
+                    <button class="option-btn medium" id="diff-medium" onclick="setDifficulty('medium')">Trung bình</button>
+                    <button class="option-btn hard" id="diff-hard" onclick="setDifficulty('hard')">Khó</button>
+                    <button class="option-btn ultimate active" id="diff-ultimate" onclick="setDifficulty('ultimate')">⚡ Cực Đại (2.0)</button>
                 </div>
             </div>
             <div class="config-row">
